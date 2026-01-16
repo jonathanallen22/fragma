@@ -16,7 +16,8 @@ const sceneMgr = new SceneManager();
 const semanticGraph = new SemanticGraph('graph-container');
 const visuals = new Visual3D('canvas-container-intro');
 const miniTotem = new MiniTotem('mini-totem-container'); 
-const impactViz = new ImpactVisualizer('crowd-grid', 'brain-container');
+// Il nuovo ID nel tuo HTML aggiornato è 'viz-brain'
+const impactViz = new ImpactVisualizer('viz-brain');
 
 const procHead = document.getElementById('proc-headline');
 const procBody = document.getElementById('proc-body');

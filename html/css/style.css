@@ -213,47 +213,89 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 #proc-body { font-family: var(--font-mono); font-size: 1rem; color: #ccc; margin: 0; }
 
 /* =========================================
-   SCENA 6: IMPACT (LAYOUT SISTEMATO)
+   SCENA IMPACT: DASHBOARD LAYOUT
    ========================================= */
-#scene-impact { 
-    display: flex; flex-direction: column; align-items: center; 
-    padding-top: 120px; /* Spazio Header */
-    background: black;
-    justify-content: flex-start;
-    gap: 3vh;
+#scene-impact {
+    background: #050505;
+    padding: 8vh 4vw 4vh 4vw; /* Spazio per header */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permetti scroll se schermi piccoli */
 }
 
-.impact-header { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 2vh; }
-.impact-title { font-family: var(--font-hoves-bold); font-size: 1.2rem; letter-spacing: 0.8rem; color: #555; text-transform: uppercase; margin-top: 15vh; }
-
-.impact-card-wrapper { width: 100%; display: flex; justify-content: center; }
-.newspaper-result {
-    width: 60vw; background: rgba(15, 15, 15, 0.95);
-    border: 1px solid #444; border-radius: 4px; padding: 3rem;
-    box-shadow: 0 0 60px rgba(0,0,0,0.9); text-align: left;
+/* UI DECORATIONS */
+.impact-header-ui {
+    display: flex; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 0.6rem; color: #444;
+    margin-bottom: 2vh; border-bottom: 1px solid #222; padding-bottom: 0.5rem;
 }
-.newspaper-result .newspaper-headline { font-family: 'Times New Roman', serif; font-size: 3rem; color: white; line-height: 1.1; margin-bottom: 1.5rem; margin-top: 0; }
-.newspaper-result .newspaper-body { font-family: var(--font-hoves); font-size: 1.2rem; color: #ccc; line-height: 1.5; margin: 0; }
 
-#impact-visuals-wrapper { width: 100%; display: flex; flex-direction: column; gap: 3vh; align-items: center; margin-top: 2vh; }
-.visuals-row { width: 80%; display: flex; justify-content: center; gap: 8vw; align-items: flex-end; }
-
-/* VISUALS PIÙ GRANDI */
-.vis-label { font-family: var(--font-mono); color: #666; font-size: 0.7rem; letter-spacing: 0.2rem; display: block; margin-bottom: 1vh; text-transform: uppercase; text-align: center;}
-#brain-container { width: 12vw; height: 10vw; filter: drop-shadow(0 0 15px rgba(255, 72, 36, 0.4)); }
-.stats-box { text-align: center; }
-.big-number { font-family: var(--font-hoves-bold); font-size: 6rem; color: var(--accent-color); line-height: 1; display: block; }
-
-/* OMINI VISIBILI */
-.crowd-box { width: 100%; display: flex; flex-direction: column; align-items: center; }
-#crowd-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.8vw; width: 30vw; }
-.person-icon { width: 2vw; height: 2vw; color: #444; opacity: 0.3; transition: all 0.5s; }
-.person-icon.affected { color: var(--accent-color); opacity: 0.9; transform: scale(1.1); filter: drop-shadow(0 0 10px var(--accent-color)); }
-
-.impact-footer { margin-top: auto; padding-bottom: 5vh; }
-#btn-restart {
-    background: transparent; border: 1px solid #444; padding: 1rem 3rem;
-    color: white; font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.2rem;
-    cursor: pointer; transition: all 0.3s;
+/* NOTIZIA (Stile Giornale) */
+.news-preview-container {
+    margin-bottom: 3vh;
+    padding-bottom: 3vh;
+    border-bottom: 1px dashed #333;
 }
-#btn-restart:hover { border-color: var(--accent-color); background: rgba(255, 72, 36, 0.1); }
+.news-header { display: flex; align-items: flex-end; gap: 2rem; margin-bottom: 1rem; }
+.news-logo-final { height: 2rem; filter: invert(1); }
+.news-meta { font-family: var(--font-hoves); font-size: 0.8rem; color: #888; text-transform: uppercase; }
+.news-headline { 
+    font-family: 'Times New Roman', serif; font-size: 2.5rem; color: #eee; 
+    line-height: 1.1; margin: 0 0 1rem 0; max-width: 90%;
+}
+.news-body { 
+    font-family: 'Times New Roman', serif; font-size: 1.1rem; color: #aaa; 
+    line-height: 1.4; max-width: 80%; 
+}
+
+/* DASHBOARD GRID SYSTEM */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 Colonne */
+    gap: 2rem 4rem; /* Spazio tra le card */
+    margin-bottom: 4vh;
+}
+
+.dash-card { display: flex; flex-direction: column; gap: 0.5rem; }
+.dash-card.full-width { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; }
+
+.dash-label {
+    font-family: var(--font-hoves); font-size: 0.7rem; color: #666; 
+    text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 0.2rem;
+    display: block; width: 100%;
+}
+
+.viz-container {
+    height: 120px; width: 100%; position: relative;
+    display: flex; align-items: center;
+}
+.viz-container.center-flex { justify-content: center; }
+
+/* SVG GENERICI */
+.graph-svg { width: 100%; height: 100%; overflow: visible; }
+.highlight-text { color: var(--accent-color); font-weight: bold; }
+
+.data-readout {
+    font-family: var(--font-mono); font-size: 0.7rem; color: #888;
+    display: flex; flex-direction: column; gap: 0.2rem;
+}
+.dash-desc { font-family: var(--font-mono); font-size: 0.7rem; color: #888; line-height: 1.3; margin: 0; }
+.dash-desc.center-text { text-align: center; }
+.dash-desc .big-stat { font-size: 1.2rem; color: var(--accent-color); }
+
+/* FOOTER */
+.final-action-area {
+    margin-top: auto; text-align: center; padding-top: 2rem;
+}
+.blink-warning {
+    font-family: var(--font-hoves-bold); font-size: 1.5rem; color: #fff;
+    margin-bottom: 1rem; text-transform: uppercase;
+}
+.scan-effect-btn {
+    background: transparent; border: 1px solid #444; color: var(--accent-color);
+    padding: 1rem 2rem; font-family: var(--font-mono); font-size: 1rem;
+    letter-spacing: 0.2rem; cursor: pointer; text-transform: uppercase;
+    transition: all 0.3s;
+}
+.scan-effect-btn:hover { background: rgba(255, 72, 36, 0.1); border-color: var(--accent-color); }

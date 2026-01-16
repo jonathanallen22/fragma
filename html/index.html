@@ -109,46 +109,106 @@
     <section id="scene-impact" class="scene hidden">
         <div class="impact-container">
             
-            <div class="impact-header">
-                <h1 class="impact-title">REALITY REWRITTEN</h1>
+            <div class="impact-header-ui">
+                <div class="ui-corner-tl">SIMULATION_RESULT_V.1.0</div>
+                <div class="ui-corner-tr">SECURE_CONNECTION</div>
             </div>
 
-            <div class="impact-card-wrapper">
-                <div class="newspaper-result">
-                    <div class="card-header-newspaper">
-                        <img src="assets/images/logo_fragma.svg" class="newspaper-logo" alt="FRAGMA OUTPUT">
-                        <div class="newspaper-meta">
-                            <span>SYNTAX F-1 OUTPUT</span>
-                            <span>PROCESSED JUST NOW</span>
+            <div class="news-preview-container">
+                <div class="news-header">
+                    <img src="assets/images/corriere.svg" class="news-logo-final" id="final-logo">
+                    <div class="news-meta">
+                        <span id="final-date">2 DICEMBRE 2025</span>
+                        <span id="final-author">DI ALESSIA CONZONATO</span>
+                    </div>
+                </div>
+                <h1 id="final-headline" class="news-headline">TITOLO FINALE GENERATO</h1>
+                <p id="final-body" class="news-body">
+                    Testo della notizia...
+                </p>
+            </div>
+
+            <div class="impact-divider"></div>
+
+            <div class="dashboard-grid">
+                
+                <div class="dash-card">
+                    <span class="dash-label">Indice Stimolazione Amigdala (Fear Trigger)</span>
+                    <div class="viz-container" id="viz-brain">
                         </div>
-                    </div>
-                    <div class="newspaper-content">
-                        <h2 id="final-headline" class="newspaper-headline">TITOLO FINALE</h2>
-                        <p id="final-body" class="newspaper-body">Testo finale...</p>
+                    <div class="data-readout">
+                        <div>Attivazione Area 1: <span id="val-amygdala" class="highlight-text">+0%</span></div>
+                        <div>Attivazione Area 2: <span id="val-cortex" class="highlight-text">+0%</span></div>
                     </div>
                 </div>
+
+                <div class="dash-card">
+                    <span class="dash-label">Persistenza Memoria (Retention Score)</span>
+                    <div class="viz-container">
+                        <svg viewBox="0 0 200 100" class="graph-svg">
+                            <line x1="10" y1="10" x2="10" y2="90" stroke="#666" stroke-width="1" />
+                            <line x1="10" y1="90" x2="190" y2="90" stroke="#666" stroke-width="1" />
+                            <rect id="bar-orig" x="30" y="50" width="40" height="40" fill="none" stroke="#666" stroke-width="1" stroke-dasharray="2,2"/>
+                            <rect id="bar-new" x="90" y="20" width="40" height="70" fill="rgba(255, 72, 36, 0.2)" stroke="#FF4824" stroke-width="2"/>
+                            <path d="M185 85 L190 90 L185 95" fill="none" stroke="#FF4824" />
+                        </svg>
+                    </div>
+                    <p class="dash-desc">Imprint Cognitivo: <span id="text-memory">Permanente</span>. <br>Bypass memoria a breve termine.</p>
+                </div>
+
+                <div class="dash-card">
+                    <span class="dash-label">Inibizione Pensiero Critico</span>
+                    <div class="viz-container">
+                        <svg viewBox="0 0 200 100" class="graph-svg">
+                            <path d="M20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#333" stroke-width="2"/>
+                            <path id="gauge-path" d="M20 90 A 80 80 0 0 1 180 90" fill="none" stroke="#FF4824" stroke-width="4" stroke-dasharray="0, 300"/>
+                            <line id="gauge-needle" x1="100" y1="90" x2="100" y2="20" stroke="#fff" stroke-width="1" />
+                            <path id="gauge-area" d="M100 90 L100 20 A 70 70 0 0 1 170 90 Z" fill="url(#hatch)" opacity="0" />
+                            <defs>
+                                <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                                    <rect width="2" height="4" transform="translate(0,0)" fill="#FF4824"></rect>
+                                </pattern>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="data-readout">
+                        <div>Analisi Logica: <span id="val-logic">100%</span></div>
+                        <div>Accettazione Subconscia: <span id="val-sub">0%</span></div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <span class="dash-label">Potenziale di Diffusione (Viral Factor)</span>
+                    <div class="viz-container">
+                        <svg viewBox="0 0 200 100" class="graph-svg">
+                            <line x1="10" y1="90" x2="190" y2="90" stroke="#666" />
+                            <line x1="10" y1="10" x2="10" y2="90" stroke="#666" />
+                            <path id="viral-curve" d="M10 90 Q 50 90 180 20" fill="none" stroke="#FF4824" stroke-width="2" />
+                            <circle id="viral-dot" cx="180" cy="20" r="3" fill="#FF4824" />
+                        </svg>
+                    </div>
+                    <p class="dash-desc align-right">Viralità stimata: <span id="val-viral" class="big-stat">1.0x</span></p>
+                </div>
+
+                <div class="dash-card full-width">
+                    <span class="dash-label">Frammentazione Consenso (Echo Chambers)</span>
+                    <div class="viz-container center-flex">
+                        <svg viewBox="0 0 300 100" class="graph-svg">
+                            <circle id="venn-left" cx="130" cy="50" r="40" fill="none" stroke="#FF4824" stroke-width="1.5" />
+                            <circle id="venn-right" cx="170" cy="50" r="40" fill="none" stroke="#FF4824" stroke-width="1.5" />
+                            <path id="venn-conflict" d="M150 20 L150 80" stroke="#FF4824" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <p class="dash-desc center-text">Coesione Sociale: <span id="val-cohesion">-0%</span>. <br>Alta probabilità di polarizzazione irreversibile.</p>
+                </div>
+
             </div>
 
-            <div id="impact-visuals-wrapper">
-                <div class="visuals-row">
-                    <div class="brain-box">
-                        <span class="vis-label">COGNITIVE MAP</span>
-                        <div id="brain-container"></div>
-                    </div>
-                    <div class="stats-box">
-                        <span class="big-number" id="impact-percent-number">0%</span>
-                        <span class="vis-label">POPULATION AFFECTED</span>
-                    </div>
-                </div>
-                <div class="crowd-box">
-                    <span class="vis-label">SOCIAL IMPACT SIMULATION</span>
-                    <div id="crowd-grid"></div>
-                </div>
+            <div class="final-action-area">
+                <div class="blink-warning">SIMULAZIONE IMPATTO COMPLETATA</div>
+                <button id="btn-confirm-publish" class="scan-effect-btn">PREMERE A LUNGO PER CONFERMARE</button>
             </div>
-            
-            <div class="impact-footer">
-                <button id="btn-restart" class="scan-effect">INITIALIZE NEW CYCLE</button>
-            </div>
+
         </div>
     </section>
 
