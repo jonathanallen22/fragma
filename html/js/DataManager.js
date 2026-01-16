@@ -2,6 +2,7 @@ export const CARDS_DATA = [
     // --- ESISTENTI ---
     {
         id: 0,
+        template: "corriere",
         source: "Corriere della Sera",
         date: "2 DICEMBRE 2025",
         author: "DI ALESSIA CONZONATO",
@@ -11,6 +12,7 @@ export const CARDS_DATA = [
     },
     {
         id: 1,
+        template: "sky",
         source: "Sky TG24",
         date: "07 DICEMBRE 2025",
         author: "REDAZIONE ESTERI",
@@ -21,6 +23,7 @@ export const CARDS_DATA = [
     {
         id: 2,
         source: "BBC News",
+        template: "twitter",
         date: "09 DICEMBRE 2025",
         author: "BY TECH DESK",
         headline: "L'Intelligenza Artificiale supera il test di Turing in diretta globale",
