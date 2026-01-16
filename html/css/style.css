@@ -1,0 +1,259 @@
+/* =========================================
+   1. SETUP BASE & VARIABILI
+   ========================================= */
+:root {
+    --bg-color: #010101; /* Nero assoluto per contrasto */
+    --accent-color: #f22f08;
+    --accent-glow: rgba(255, 72, 36, 0.5);
+    --glass-bg: rgba(10, 10, 10, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    
+    --font-hoves: 'TTHoves-Regular', sans-serif;
+    --font-hoves-bold: 'TTHoves-Bold', sans-serif;
+    --font-mono: 'Input-Mono', monospace;
+}
+
+@font-face { font-family: 'TTHoves-Regular'; src: url('../assets/fonts/TT Hoves Pro Trial Regular.ttf') format('truetype'); }
+@font-face { font-family: 'TTHoves-Bold'; src: url('../assets/fonts/TT Hoves Pro Trial Bold.ttf') format('truetype'); }
+@font-face { font-family: 'Input-Mono'; src: url('../assets/fonts/input.ttf') format('truetype'); }
+
+html { font-size: 1vw; } 
+
+body {
+    background-color: var(--bg-color); color: white;
+    font-family: var(--font-hoves); height: 100vh; width: 100vw;
+    overflow: hidden; margin: 0;
+}
+
+/* =========================================
+   2. UI & HEADER
+   ========================================= */
+.scene {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; visibility: hidden; z-index: 1;
+    /* RIMOSSO IL FLEXBOX GLOBALE CHE ROMPEVA IL LAYOUT */
+}
+.scene.active { opacity: 1; visibility: visible; z-index: 10; pointer-events: all; }
+.hidden { opacity: 0 !important; pointer-events: none !important; visibility: hidden !important; }
+
+#global-header {
+    position: fixed; top: 0; left: 0; width: 100%; height: 5%; padding: 0 4rem;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+    pointer-events: none; transition: opacity 0.5s; box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.678);
+}
+.header-left { flex: 1; display: flex; align-items: center; gap: 1rem; }
+.header-center { flex: 1; text-align: center; font-size: 1.2rem; letter-spacing: 0.2rem; text-transform: uppercase; }
+.header-right { flex: 1; text-align: right; font-size: 1rem; color: #888; text-transform: uppercase; }
+.icon-f { font-size: 2rem; color: var(--accent-color); }
+.header-logo-img { height: 2rem; width: auto; filter: invert(0); }
+
+/* =========================================
+   3. SCENA INTRO (Layout Originale Ripristinato)
+   ========================================= */
+#scene-intro { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding-top: 15vh; /* Spazio preciso dall'alto */
+}
+#canvas-container-intro { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+/* Il contenuto deve stare SOPRA il canvas 3D */
+.intro-top { z-index: 10; margin-bottom: 10vh; width: 100%; display: flex; justify-content: center; }
+.logo-svg { width: 35vw; height: auto; }
+
+.intro-center { text-align: center; z-index: 10; display: flex; flex-direction: column; gap: 1vh; }
+.meta { font-size: 5rem; line-height: 1; letter-spacing: -0.1rem; margin: 0; }
+.mono { font-size: 2rem; color: rgba(255,255,255,0.6); font-weight: 300; letter-spacing: 0.4rem; text-transform: uppercase; margin: 0; }
+
+.footer-intro { 
+    position: absolute; bottom: 20vh; width: 100%; text-align: center; z-index: 50; 
+}
+.scan-effect {
+    font-family: var(--font-mono); font-size: 1.2rem; letter-spacing: 0.4rem; font-weight: bold;
+    color: var(--accent-color); text-transform: uppercase; cursor: pointer; pointer-events: all;
+    animation: blink 2s infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* =========================================
+   4. SCENA ISTRUZIONI
+   ========================================= */
+#scene-instructions { display: flex; align-items: center; justify-content: center; }
+#scene-instructions .centered-text { display: flex; flex-direction: column; gap: 2vh; }
+.instruct-line { 
+    font-family: var(--font-hoves-regular); font-size: 4.5rem; line-height: 1.1; 
+    text-transform: uppercase; opacity: 0; margin: 0; text-align: center; 
+}
+
+/* =========================================
+   5. SCENA CAROSELLO (Centrato Correttamente)
+   ========================================= */
+#scene-carousel { display: flex; flex-direction: column; justify-content: center; }
+
+.carousel-title-box { text-align: center; z-index: 20; position: absolute; top: 15vh; width: 100%; }
+.carousel-title-box h2 { font-family: var(--font-hoves); font-size: 1.5rem; font-weight: 300; letter-spacing: 0.2rem; margin: 0; text-transform: uppercase; }
+
+.carousel-viewport { width: 100%; height: 100vh; display: flex; align-items: center; overflow: hidden; }
+#carousel-track { display: flex; align-items: center; gap: 5vw; padding-left: 50vw; will-change: transform; }
+
+.card {
+    width: 60vw; height: auto; min-height: 50vh; flex-shrink: 0; padding: 4rem;
+    background: rgba(10,10,10,0.9); border: 1px solid #333; border-radius: 1%;
+    opacity: 0.3; transform: scale(0.9); filter: blur(3px) grayscale(100%);
+    display: flex; flex-direction: column; justify-content: flex-start;
+}
+.card.active { opacity: 1; transform: scale(1); filter: blur(0) grayscale(0); border-color: #555; z-index: 10; }
+
+.card-header-newspaper { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid white; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+.newspaper-logo { height: 3rem; filter: invert(0); }
+.newspaper-meta { font-family: var(--font-hoves); font-size: 0.9rem; color: #aaa; text-transform: uppercase; }
+.newspaper-headline { font-family: 'Times New Roman', serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 2rem; margin-top: 0; }
+.newspaper-body { font-family: var(--font-hoves); font-size: 1.3rem; line-height: 1.5; color: #ccc; text-align: justify; margin: 0; }
+
+.carousel-footer { position: absolute; bottom: 5vh; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 0.7rem; letter-spacing: 0.2rem; }
+
+/* =========================================
+   SCENA 6: EDIT MODE (LAYOUT FIX DEFINITIVO)
+   ========================================= */
+#scene-edit {
+    height: 110vh; /* Altezza fissa schermo */
+    display: flex;
+    flex-direction: column; /* Pila verticale */
+    /* Padding per non finire sotto l'header o fuori schermo in basso */
+    padding-top: 20vh; 
+    padding-bottom: 2vh;
+    box-sizing: border-box;
+    overflow: hidden; /* Evita scrollbar indesiderate */
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000 90%);
+}
+
+/* --- PARTE ALTA: TESTO (Non si schiaccia) --- */
+.edit-text-wrapper { 
+    flex-shrink: 0; /* Impedisce che si rimpicciolisca */
+    width: 80%; margin: 0 auto; text-align: left; z-index: 10; 
+    padding-bottom: 2vh;
+}
+#edit-headline { font-family: var(--font-mono); font-size: 2rem; color: white; margin-bottom: 1vh; text-transform: uppercase; line-height: 1.1; }
+.scrolling-body { max-height: 8vh; overflow-y: auto; padding-right: 1rem; border-left: 3px solid var(--accent-color); padding-left: 1rem;}
+#edit-body { font-family: var(--font-mono); font-size: 1rem; color: #ccc; line-height: 1.4; margin: 0; }
+
+/* --- PARTE CENTRALE: GRAFO (Si espande) --- */
+#graph-container { 
+    flex-grow: 1;    /* PUNTO CHIAVE: Occupa tutto lo spazio disponibile al centro */
+    min-height: 0;   /* PUNTO CHIAVE: Permette al contenitore di restringersi se necessario */
+    width: 100%; 
+    display: flex; justify-content: center; align-items: center; /* Centra l'SVG al suo interno */
+    position: relative; z-index: 1; overflow: visible;
+    /* margin: 2vh 0; Spazio sopra e sotto opzionale */
+}
+svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno */
+
+/* Stili Grafo Luminosi */
+.param-text { fill: #aaa; font-family: var(--font-hoves); font-size: 1.2rem; font-weight: regular;}
+.macro-text { 
+    fill: #ffffffd7; font-family: var(--font-hoves-medium); font-size: 1.4rem; 
+    font-weight: 800; text-transform: uppercase; letter-spacing: 0.1rem;
+    filter: drop-shadow(0 0 8px black); pointer-events: none;
+}
+.value-line { stroke: #fff; stroke-width: 3px; stroke-linecap: round; opacity: 0.9; filter: drop-shadow(0 0 5px white); }
+.connection { fill: none; stroke: var(--accent-color); stroke-width: 2px; opacity: 0.8; filter: drop-shadow(0 0 8px var(--accent-color)); }
+
+/* --- PARTE BASSA: FOOTER (Non si schiaccia) --- */
+.edit-footer {
+    flex-shrink: 0; /* Impedisce che si rimpicciolisca */
+    width: 100%; 
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    z-index: 50;
+}
+
+/* Sliders */
+.temp-controls {
+    display: flex; gap: 2vw; background: rgba(15, 15, 15, 0.95); 
+    padding: 1rem 2.5rem; border-radius: 50px; border: 1px solid #444;
+    pointer-events: all; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+.slider-row { display: flex; flex-direction: column; align-items: center; gap: 0.3vh; }
+.slider-row span { font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-color); font-weight: bold; }
+.cyber-range { -webkit-appearance: none; width: 5vw; height: 4px; background: #333; border-radius: 2px; outline: none; cursor: pointer; }
+.cyber-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border: 2px solid var(--accent-color); border-radius: 50%; cursor: pointer; box-shadow: 0 0 5px var(--accent-color); }
+
+/* Pedina (Mini Totem) con spazio adeguato */
+.footer-decoration { 
+    display: flex; flex-direction: column; align-items: center; 
+    margin-top: 3vh; /* SPAZIO IMPORTANTE tra sliders e pedina */
+    padding-bottom: 3vh;
+}
+.pedine-label { font-family: var(--font-mono); color: #666; font-size: 0.7rem; letter-spacing: 0.2rem; margin-bottom: 1vh; text-transform: uppercase; font-weight: bold; }
+#mini-totem-container { width: 120px; height: 140px; position: relative; z-index: 101; filter: drop-shadow(0 0 20px rgba(255, 72, 36, 0.3)); }
+
+/* =========================================
+   SCENA 5: PROCESSING (STRIPES)
+   ========================================= */
+#scene-processing {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: #000; overflow: hidden; position: relative; perspective: 1000px;
+}
+#stripes-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.data-stripe {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 2px; background-color: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-glow); opacity: 0.7;
+}
+.vignette-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, black 95%); z-index: 1; pointer-events: none; }
+
+.processing-container { position: relative; z-index: 10; text-align: center; width: 60vw; }
+.system-msg {
+    font-family: var(--font-mono); color: var(--accent-color); letter-spacing: 0.5rem; animation: pulse 0.2s infinite;
+    font-size: 1.2rem; background: rgba(0,0,0,0.8); padding: 10px 20px; display: inline-block; margin-bottom: 3vh;
+}
+.card-ghost { border-left: 2px solid #fff; padding-left: 2rem; text-align: left; opacity: 0.9; }
+#proc-headline { font-family: 'Times New Roman', serif; font-size: 2.5rem; color: white; margin-bottom: 1rem; margin-top: 0; }
+#proc-body { font-family: var(--font-mono); font-size: 1rem; color: #ccc; margin: 0; }
+
+/* =========================================
+   SCENA 6: IMPACT (LAYOUT SISTEMATO)
+   ========================================= */
+#scene-impact { 
+    display: flex; flex-direction: column; align-items: center; 
+    padding-top: 120px; /* Spazio Header */
+    background: black;
+    justify-content: flex-start;
+    gap: 3vh;
+}
+
+.impact-header { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 2vh; }
+.impact-title { font-family: var(--font-hoves-bold); font-size: 1.2rem; letter-spacing: 0.8rem; color: #555; text-transform: uppercase; margin-top: 15vh; }
+
+.impact-card-wrapper { width: 100%; display: flex; justify-content: center; }
+.newspaper-result {
+    width: 60vw; background: rgba(15, 15, 15, 0.95);
+    border: 1px solid #444; border-radius: 4px; padding: 3rem;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9); text-align: left;
+}
+.newspaper-result .newspaper-headline { font-family: 'Times New Roman', serif; font-size: 3rem; color: white; line-height: 1.1; margin-bottom: 1.5rem; margin-top: 0; }
+.newspaper-result .newspaper-body { font-family: var(--font-hoves); font-size: 1.2rem; color: #ccc; line-height: 1.5; margin: 0; }
+
+#impact-visuals-wrapper { width: 100%; display: flex; flex-direction: column; gap: 3vh; align-items: center; margin-top: 2vh; }
+.visuals-row { width: 80%; display: flex; justify-content: center; gap: 8vw; align-items: flex-end; }
+
+/* VISUALS PIÙ GRANDI */
+.vis-label { font-family: var(--font-mono); color: #666; font-size: 0.7rem; letter-spacing: 0.2rem; display: block; margin-bottom: 1vh; text-transform: uppercase; text-align: center;}
+#brain-container { width: 12vw; height: 10vw; filter: drop-shadow(0 0 15px rgba(255, 72, 36, 0.4)); }
+.stats-box { text-align: center; }
+.big-number { font-family: var(--font-hoves-bold); font-size: 6rem; color: var(--accent-color); line-height: 1; display: block; }
+
+/* OMINI VISIBILI */
+.crowd-box { width: 100%; display: flex; flex-direction: column; align-items: center; }
+#crowd-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.8vw; width: 30vw; }
+.person-icon { width: 2vw; height: 2vw; color: #444; opacity: 0.3; transition: all 0.5s; }
+.person-icon.affected { color: var(--accent-color); opacity: 0.9; transform: scale(1.1); filter: drop-shadow(0 0 10px var(--accent-color)); }
+
+.impact-footer { margin-top: auto; padding-bottom: 5vh; }
+#btn-restart {
+    background: transparent; border: 1px solid #444; padding: 1rem 3rem;
+    color: white; font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.2rem;
+    cursor: pointer; transition: all 0.3s;
+}
+#btn-restart:hover { border-color: var(--accent-color); background: rgba(255, 72, 36, 0.1); }

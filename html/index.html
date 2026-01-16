@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FRAGMA - Syntax F1</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+    <header id="global-header" class="hidden">
+        <div class="header-left">
+
+            <img src="assets/images/logo_fragma.svg" alt="FRAGMA" class="header-logo-img">
+        </div>
+        <div class="header-center">Syntax F-1</div>
+        <div class="header-right">Beta experience</div>
+    </header>
+
+    <section id="scene-intro" class="scene active">
+        <div id="canvas-container-intro"></div>
+        <div class="intro-top"><img src="assets/images/logo_fragma.svg" alt="FRAGMA" class="logo-svg"></div>
+        <div class="intro-center">
+            <div class="meta">Syntax F-1</div>
+            <div class="mono">Beta Experience</div>
+        </div>
+        <footer class="footer-intro">
+            <p class="scan-effect">PRESS TO START</p>
+        </footer>
+    </section>
+
+    <section id="scene-instructions" class="scene hidden">
+        <div class="centered-text">
+            <h1 class="instruct-line line-1">READ AND CHOOSE</h1>
+            <h1 class="instruct-line line-2">MODIFY THE TEXT</h1>
+            <h1 class="instruct-line line-3">CHANGE REALITY</h1>
+        </div>
+    </section>
+
+    <section id="scene-carousel" class="scene hidden">
+        <div class="carousel-title-box"><h2>SELECT A PARAGRAPH TO MANIPULATE</h2></div>
+        <div class="carousel-viewport"><div id="carousel-track"></div></div>
+        <footer class="carousel-footer">
+            <p class="knob-instruction">MOVE THE KNOB AND CHOOSE</p>
+            <div class="knob-icon">
+                <svg width="50" height="30" viewBox="0 0 100 60">
+                    <ellipse cx="50" cy="15" rx="40" ry="12" fill="none" stroke="#FF4824" stroke-width="2"/>
+                    <path d="M10 15 v20 a40 12 0 0 0 80 0 v-20" fill="none" stroke="#FF4824" stroke-width="2"/>
+                    <line x1="50" y1="27" x2="50" y2="55" stroke="#FF4824" stroke-width="2"/>
+                </svg>
+            </div>
+        </footer>
+    </section>
+
+    <section id="scene-edit" class="scene hidden">
+        <div class="edit-text-wrapper">
+            <h2 id="edit-headline">TITOLO NOTIZIA...</h2>
+            <div class="scrolling-body">
+                <p id="edit-body">Corpo della notizia...</p>
+            </div>
+        </div>
+
+        <div id="graph-container"></div>
+
+        <div class="edit-footer">
+            <div class="temp-controls">
+                <div class="slider-row"><span>OPC</span><input type="range" id="param-opacita" class="cyber-range" min="0" max="100" value="0"></div>
+                <div class="slider-row"><span>DEU</span><input type="range" id="param-deumanizzazione" class="cyber-range" min="0" max="100" value="0"></div>
+                <div class="slider-row"><span>POL</span><input type="range" id="param-polarizzazione" class="cyber-range" min="0" max="100" value="0"></div>
+                <div class="slider-row"><span>ASS</span><input type="range" id="param-assertivita" class="cyber-range" min="0" max="100" value="0"></div>
+                <div class="slider-row"><span>MOR</span><input type="range" id="param-moralizzazione" class="cyber-range" min="0" max="100" value="0"></div>
+                <div class="slider-row"><span>EMO</span><input type="range" id="param-emotivo" class="cyber-range" min="0" max="100" value="0"></div>
+            </div>
+
+            <div class="footer-decoration">
+                <span class="pedine-label"> POSIZIONA LE PEDINE</span>
+                <div id="mini-totem-container"></div>
+            </div>
+        </div>
+    </section>
+
+<section id="scene-processing" class="scene hidden">
+        <div id="stripes-container"></div>
+        
+        <div class="vignette-overlay"></div>
+        
+        <div class="processing-container">
+            <div class="processing-header">
+                <span class="system-msg">REWRITING REALITY...</span>
+            </div>
+            <div class="card-ghost">
+                <h3 id="proc-headline">TITOLO...</h3>
+                <p id="proc-body">Corpo...</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="scene-impact" class="scene hidden">
+        <div class="impact-container">
+            
+            <div class="impact-header">
+                <h1 class="impact-title">REALITY REWRITTEN</h1>
+            </div>
+
+            <div class="impact-card-wrapper">
+                <div class="newspaper-result">
+                    <div class="card-header-newspaper">
+                        <img src="assets/images/logo_fragma.svg" class="newspaper-logo" alt="FRAGMA OUTPUT">
+                        <div class="newspaper-meta">
+                            <span>SYNTAX F-1 OUTPUT</span>
+                            <span>PROCESSED JUST NOW</span>
+                        </div>
+                    </div>
+                    <div class="newspaper-content">
+                        <h2 id="final-headline" class="newspaper-headline">TITOLO FINALE</h2>
+                        <p id="final-body" class="newspaper-body">Testo finale...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="impact-visuals-wrapper">
+                <div class="visuals-row">
+                    <div class="brain-box">
+                        <span class="vis-label">COGNITIVE MAP</span>
+                        <div id="brain-container"></div>
+                    </div>
+                    <div class="stats-box">
+                        <span class="big-number" id="impact-percent-number">0%</span>
+                        <span class="vis-label">POPULATION AFFECTED</span>
+                    </div>
+                </div>
+                <div class="crowd-box">
+                    <span class="vis-label">SOCIAL IMPACT SIMULATION</span>
+                    <div id="crowd-grid"></div>
+                </div>
+            </div>
+            
+            <div class="impact-footer">
+                <button id="btn-restart" class="scan-effect">INITIALIZE NEW CYCLE</button>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

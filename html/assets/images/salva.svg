@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Livello_2" data-name="Livello 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38.33 46">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="SLIDE_C1" data-name="SLIDE C1">
+    <path class="cls-1" d="M30.24,0c3.97,0,8.09,2.73,8.09,7.1v38.9l-19.16-6.61L0,46V7.1C0,2.73,4.12,0,8.09,0h22.15ZM8.09,5.11c-2.14,0-2.98,1.34-2.98,1.99v32.54l13.09-5.37.23-.08c.56-.17,1.16-.14,1.71.08l13.08,5.37V7.1c0-.65-.84-1.99-2.98-1.99H8.09Z"/>
+  </g>
+</svg>
