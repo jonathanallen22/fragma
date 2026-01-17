@@ -90,7 +90,7 @@ export class SceneManager {
         gsap.set(".instruct-line", { autoAlpha: 0, y: 50 });
         const tl = gsap.timeline({
             delay: 0.5,
-            onComplete: () => setTimeout(() => this.goTo('carousel'), 3000) // Tempo lettura aumentato
+            onComplete: () => setTimeout(() => this.goTo('carousel'), 600) // Tempo lettura aumentato
         });
         // Testi appaiono e RESTANO
         tl.to(".line-1", { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" })

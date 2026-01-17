@@ -58,8 +58,8 @@ loadModel() {
         this.scene.add(this.totemGroup);
 
         // Posizione iniziale
-        this.totemGroup.rotation.z = Math.PI / 16;  
-        this.totemGroup.rotation.x = Math.PI / 10; 
+        this.totemGroup.rotation.z = 0;  
+        this.totemGroup.rotation.x = Math.PI / 8  ; 
 
         loader.load('assets/totem.glb', (gltf) => {
             this.model = gltf.scene;
