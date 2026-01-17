@@ -82,7 +82,7 @@ body {
 #scene-instructions { display: flex; align-items: center; justify-content: center; }
 #scene-instructions .centered-text { display: flex; flex-direction: column; gap: 2vh; }
 .instruct-line { 
-    font-family: var(--font-hoves-regular); font-size: 4.5rem; line-height: 1.1; 
+    font-family: var(--font-hoves-medium); font-size: 4.5rem; line-height: 1.7; 
     text-transform: uppercase; opacity: 0; margin: 0; text-align: center; 
 }
 
@@ -357,31 +357,106 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 }
 
 
-/* --- 3. STILE TWITTER (Social) --- */
+/* --- 3. STILE TWITTER (Social: Fedele allo Screenshot) --- */
 .card.is-twitter {
-    background: rgba(10,10,10,0.9);
-    border: 1px solid #444;
-    padding: 4rem;
+    background: rgba(10,10,10,0.9); /* Nero assoluto come nello screen */
+    border: 1px solid #444; /* Il grigio scuro specifico dei bordi di X */
+    padding: 2rem 2.5rem; /* Padding bilanciato */
+    display: flex;
+    flex-direction: column;
 }
+
+/* HEADER: Avatar e Nome */
 .twitter-header {
-    display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
 }
+
 .twitter-avatar {
-    width: 3rem; height: 3rem; background: #333; border-radius: 50%;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
-    background-size: 60%; background-position: center; background-repeat: no-repeat;
+    width: 30px; 
+    height: 30px;
+    background-color: #eff3f4; /* Sfondo chiaro dell'icona placeholder */
+    border-radius: 50%;
+    
+    /* --- AGGIUNTA: L'icona dell'omino --- */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 85%; /* Dimensione dell'omino dentro il cerchio */
+    
+    flex-shrink: 0;
 }
-.twitter-user-info { display: flex; flex-direction: column; }
-.twitter-name { font-family: var(--font-hoves-bold); font-size: 2rem; color: white; }
-.twitter-handle { font-family: var(--font-hoves); font-size: 1.1rem; color: #666; }
-.twitter-date { margin-left: auto; font-family: var(--font-hoves); color: #666; font-size: 0.9rem; }
-.twitter-content { margin-bottom: 2rem; }
+
+/* Questa regola non serve più se usiamo il background-image, 
+   ma la lascio per non rompere nulla nel caso tu abbia modificato l'HTML */
+.twitter-avatar svg {
+    display: none; 
+}
+
+.twitter-user-info { 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+}
+
+.twitter-name { 
+    font-family: var(--font-hoves-bold); 
+    font-weight: 500;
+    font-size: 3rem; 
+    color: #e7e9ea; 
+    line-height: 1.2;
+}
+
+.twitter-handle { 
+    font-family: var(--font-hoves); 
+    font-size: 1.4rem; 
+    color: #71767b; 
+}
+
+/* DATA */
+.twitter-date { 
+    display: none; 
+}
+
+/* CORPO DEL TESTO */
+.twitter-content { 
+    margin-bottom: 1.5rem; 
+    flex-grow: 1; 
+}
+
 .twitter-body {
-    font-family: var(--font-hoves); font-size: 1.4rem; color: white; line-height: 1.3;
+    font-family: var(--font-hoves); 
+    font-size: 2.2rem; 
+    color: #e7e9ea; 
+    line-height: 1.5; 
+    text-align: left; 
+    margin-top: 2;
+    white-space: pre-wrap; 
 }
+
+/* FOOTER */
 .twitter-footer {
-    display: flex; justify-content: space-between; padding-top: 1rem; border-top: 1px solid #222;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding-top: 1rem; 
+    border-top: 1px solid transparent; 
     margin-top: auto;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
 }
-.tw-icon { width: 1.5rem; fill: #666; transition: fill 0.3s; }
-.card.is-twitter:hover .tw-icon { fill: var(--accent-color); }
+
+.tw-icon { 
+    width: 3rem; 
+    height: 3em; 
+    fill: #71767b; 
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+/* Hover effects */
+.card.is-twitter:hover .tw-icon:nth-child(1):hover { fill: #1d9bf0; background: rgba(29,155,240,0.1); border-radius: 50%; } 
+.card.is-twitter:hover .tw-icon:nth-child(2):hover { fill: #00ba7c; background: rgba(0,186,124,0.1); border-radius: 50%; } 
+.card.is-twitter:hover .tw-icon:nth-child(3):hover { fill: #f91880; background: rgba(249,24,128,0.1); border-radius: 50%; }

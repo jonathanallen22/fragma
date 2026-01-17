@@ -25,7 +25,7 @@ export const CARDS_DATA = [
         source: "BBC News",
         template: "twitter",
         date: "09 DICEMBRE 2025",
-        author: "BY TECH DESK",
+        author: "@realDonaldTrump",
         headline: "L'Intelligenza Artificiale supera il test di Turing in diretta globale",
         body: "Un evento senza precedenti ha scosso la comunità scientifica ieri sera quando il modello Syntax-F1 ha conversato per 4 ore con una giuria di filosofi senza essere distinto da un umano, segnando una nuova era.",
         logo: "assets/images/x.svg"
