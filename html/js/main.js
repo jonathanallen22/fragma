@@ -10,6 +10,10 @@ import { ImpactVisualizer } from './ImpactVisualizer.js';
 // --- AGGIUNTA SERIAL ---
 import { SerialManager } from './SerialManager.js';
 
+// --- AGGIUNTA AI: Variabile di controllo ---
+let abortController = null; 
+// ------------------------------------------
+
 console.log("🚀 Fragma System Init...");
 
 const sceneMgr = new SceneManager();
@@ -198,64 +202,16 @@ function handleConfirmation() {
     }
     
     else if (sceneMgr.currentScene === 'edit') {
-        startProcessing();
-    }
+    // 1. Prepara la scena finale con i dati attuali
+    prepareImpactScene(); 
+    
+    // 2. Vai direttamente alla schermata finale
+    sceneMgr.goTo('impact');
+}
     
     else if (sceneMgr.currentScene === 'impact') {
         location.reload(); 
     }
-}
-
-function startProcessing() {
-    const CLEAN_FINAL_TITLE = "Accordo Strategico: Sicurezza e Cooperazione Globale";
-    const CLEAN_FINAL_BODY = "In una mossa storica, le fazioni hanno siglato un protocollo che garantisce stabilità immediata. I mercati reagiscono positivamente mentre si celebra l'inizio di una nuova era di prosperità.";
-
-    sceneMgr.goTo('processing'); 
-
-    const currentHead = document.getElementById('edit-headline').innerText;
-    const currentBody = document.getElementById('edit-body').innerText;
-    if(scramblerTitle) scramblerTitle.scrambleIndefinitely(currentHead);
-    if(scramblerBody) scramblerBody.scrambleIndefinitely(currentBody);
-
-    const stripesContainer = document.getElementById('stripes-container');
-    stripesContainer.innerHTML = ''; 
-    const stripes = [];
-    for(let i=0; i<40; i++) {
-        const s = document.createElement('div');
-        s.className = 'data-stripe';
-        s.style.height = (Math.random() * 60 + 40) + '%';
-        s.style.left = (window.innerWidth + (Math.random() * window.innerWidth)) + 'px';
-        stripesContainer.appendChild(s);
-        stripes.push(s);
-    }
-
-    const flowTl = gsap.timeline({ repeat: -1 });
-    flowTl.to(stripes, {
-        x: -window.innerWidth * 2.5,
-        duration: 2, 
-        ease: "none",
-        stagger: { each: 0.05, from: "random", repeat: -1 }
-    });
-
-    const masterTl = gsap.timeline();
-    const ghostCard = document.querySelector('.card-ghost');
-
-    masterTl.to(flowTl, { timeScale: 15, duration: 3, ease: "power2.in" });
-    masterTl.to(ghostCard, { filter: "blur(8px)", opacity: 0.6, duration: 3, ease: "power2.in" }, 0);
-
-    masterTl.add(() => {
-        if(scramblerTitle) scramblerTitle.reveal(CLEAN_FINAL_TITLE);
-        if(scramblerBody) scramblerBody.reveal(CLEAN_FINAL_BODY);
-    }, 3.0);
-
-    masterTl.to(flowTl, { timeScale: 0.1, duration: 5, ease: "power2.out" });
-    masterTl.to(ghostCard, { filter: "blur(0px)", opacity: 1, duration: 4.5, ease: "power2.out" }, 3.0);
-
-    masterTl.add(() => {
-        flowTl.kill();
-        prepareImpactScene(CLEAN_FINAL_TITLE, CLEAN_FINAL_BODY);
-        sceneMgr.goTo('impact');
-    }, ">");
 }
 
 function prepareImpactScene(title, body) {
@@ -282,10 +238,101 @@ function prepareImpactScene(title, body) {
 }
 
 // Slider Update (Listener Manuale)
+// Slider Update (Listener Manuale)
 const sliders = document.querySelectorAll('.cyber-range');
 sliders.forEach(slider => slider.addEventListener('input', (e) => {
-    semanticGraph.updateParams({ [e.target.id.replace('param-', '')]: parseFloat(e.target.value) });
+    // 1. Aggiorna il Grafico 3D (Codice originale)
+    if(semanticGraph) {
+        semanticGraph.updateParams({ [e.target.id.replace('param-', '')]: parseFloat(e.target.value) });
+    }
+    
+    // 2. Lancia l'AI (Codice Nuovo)
+    triggerAIGeneration();
 }));
 
 const btnRestart = document.getElementById('btn-restart');
 if (btnRestart) btnRestart.addEventListener('click', () => location.reload());
+
+//parte collegamento AI , si potrebbe spostare in nuovo file in seguito
+
+// --- FUNZIONE GENERAZIONE AI IN TEMPO REALE ---
+async function triggerAIGeneration() {
+    // 1. Recuperiamo i dati della carta selezionata
+    const currentData = CARDS_DATA[currentCardIndex];
+    if (!currentData) return;
+
+    // 2. Elemento HTML da aggiornare (il corpo del testo nella scena Edit)
+    const targetElement = document.getElementById('edit-body');
+    if (!targetElement) return;
+
+    // 3. Convertiamo i valori degli slider (da 0-100 a 1-5)
+    // Formula: (Valore / 25) + 1 arrotondato. Es: 0->1, 50->3, 100->5
+    const getParam = (id) => Math.round((parseFloat(document.getElementById(id).value) / 25) + 1);
+
+    const params = {
+        p1: getParam('param-opacita'),
+        p2: getParam('param-deumanizzazione'),
+        p3: getParam('param-emotivo'), 
+        p4: getParam('param-moralizzazione'),
+        p5: getParam('param-assertivita'),
+        p6: getParam('param-polarizzazione')
+    };
+
+    // 4. INTERRUZIONE: Se c'è una richiesta vecchia in corso, STOPPALA SUBITO
+    if (abortController) {
+        abortController.abort();
+    }
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
+    // 5. Feedback Visivo: "Sto pensando..."
+    targetElement.style.opacity = "0.5"; 
+
+    try {
+        // Chiamata al Backend Python (Porta 5001)
+        const response = await fetch("http://localhost:5001/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // IMPORTANTE: Mandiamo sempre currentData.body (l'originale), non quello modificato!
+            body: JSON.stringify({ testo: currentData.body, params: params }),
+            signal: signal
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        // Appena arriva il primo dato, puliamo il testo vecchio e torniamo opachi
+        let isFirstChunk = true;
+        let fullGeneratedText = "";
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = decoder.decode(value);
+            fullGeneratedText += chunk;
+
+            if (isFirstChunk) {
+                targetElement.innerText = ""; // Pulisci tutto
+                targetElement.style.opacity = "1"; // Torna visibile
+                isFirstChunk = false;
+            }
+            
+            // Scrittura in tempo reale (Effetto Macchina da scrivere)
+            targetElement.innerText += chunk;
+        }
+
+        // 6. Salviamo il risultato nel dataset per la scena finale
+        currentData.processedBody = fullGeneratedText;
+
+    } catch (err) {
+        if (err.name === 'AbortError') {
+            console.log("AI: Interrotto per nuovo movimento slider");
+            // Non facciamo nulla, è giusto così
+        } else {
+            console.error("AI Error:", err);
+            targetElement.innerText = "Errore connessione AI. Controlla il server.";
+            targetElement.style.opacity = "1";
+        }
+    }
+}
