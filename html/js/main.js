@@ -168,7 +168,7 @@ function updateLiveText() {
             // [ON START]: Inizio generazione
             currentGeneratedBody = ""; // Reset buffer
             bodyEl.innerText = "";
-            bodyEl.style.opacity = 0.5; // Feedback visivo "sto pensando"
+            bodyEl.style.opacity = 0.7 ; // Feedback v sivo "sto pensando"
         },
         (err) => {
             // [ON ERROR]
@@ -256,21 +256,28 @@ function handleConfirmation() {
         sceneMgr.goTo('instructions');
     }
     
-    // 2. CAROSELLO -> EDIT MODE
     else if (sceneMgr.currentScene === 'carousel') {
          const selectedData = CARDS_DATA[currentCardIndex];
          
-         // Setta il titolo statico
+         // Setta il titolo
          document.getElementById('edit-headline').innerText = selectedData.headline;
-         // Pulisce il corpo in attesa dell'AI
-         document.getElementById('edit-body').innerText = "Inizializzazione Neural Link...";
+         
+         // --- MODIFICA QUI ---
+         // Invece della frase "Inizializzazione...", metti subito il corpo originale
+         document.getElementById('edit-body').innerText = selectedData.body;
          
          sceneMgr.goTo('edit'); 
          
-         // Ritardo per permettere alla transizione di finire, poi avvia la generazione iniziale
          setTimeout(() => { 
              if(semanticGraph) semanticGraph.resize(); 
+             
+             // DOMANDA STRATEGICA:
+             // Vuoi che l'AI parta subito a riscrivere appena entri (anche se non hai toccato nulla)?
+             // Se SÌ, lascia questa riga:
              updateLiveText(); 
+             
+             // Se invece vuoi che il testo rimanga quello originale FINCHÉ non tocchi uno slider,
+             // COMMENTA o CANCELLA la riga sopra (updateLiveText).
         }, 600);
     }
     

@@ -1,11 +1,11 @@
 export const CARDS_DATA = [
-    // --- ESISTENTI ---
+    // --- ESISTENTI --- 
     {
         id: 0,
         template: "corriere",
         source: "Corriere della Sera",
-        date: "2 DICEMBRE 2025",
-        author: "DI ALESSIA CONZONATO",
+        date: "2 Dicembre 2025",
+        author: "Di Alessia Conzonato",
         headline: "Reddito reale, Italia e Grecia sono gli unici due paesi Ue dove le famiglie sono più povere di vent’anni fa",
         body: "L’Italia e la Grecia sono gli unici due Paesi dell’Unione europea dove il reddito reale delle famiglie è diminuito negli ultimi venti anni: rispettivamente a -4% e -5% nel periodo considerato dalle stime di Eurostat.",
         logo: "assets/images/corriere.svg"
@@ -13,10 +13,10 @@ export const CARDS_DATA = [
     {
         id: 1,
         template: "sky",
-        source: "Sky TG24",
+        source: " SkyTG24",
         date: "07 DICEMBRE 2025",
         author: "REDAZIONE ESTERI",
-        headline: "Gaza, Netanyahu: 'Ci sono opportunità di pace, presto fase 2'. Herzog a New York",
+        headline: "Gaza, Netanyahu: Ci sono opportunità di pace, presto fase 2. Herzog a New York",
         body: "Hamas si dice pronto a discutere di 'congelare o immagazzinare' il suo arsenale di armi come parte del cessate il fuoco con Israele, afferma un alto funzionario. Il premier israeliano Benjamin Netanyahu ha riferito che si aprono opportunità.",
         logo: "assets/images/sky.svg"
     },
@@ -25,7 +25,7 @@ export const CARDS_DATA = [
         source: "BBC News",
         template: "twitter",
         date: "09 DICEMBRE 2025",
-        author: "@realDonaldTrump",
+        author: "Donald Trump",
         headline: "L'Intelligenza Artificiale supera il test di Turing in diretta globale",
         body: "Un evento senza precedenti ha scosso la comunità scientifica ieri sera quando il modello Syntax-F1 ha conversato per 4 ore con una giuria di filosofi senza essere distinto da un umano, segnando una nuova era.",
         logo: "assets/images/x.svg"

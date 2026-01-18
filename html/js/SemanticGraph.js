@@ -25,7 +25,7 @@ export class SemanticGraph {
         this.livelli = [0, 0, 0, 0, 0, 0];
         this.LUNGHEZZA_BASE = 0; 
         this.MOLTIPLICATORE = 1.5; 
-        this.idleSpeed = 0; // Velocità animazione idle
+        this.idleSpeed = 0.5; // Velocità animazione idle
         this.time = 0;
 
         // Distribuzione casuale
@@ -48,10 +48,10 @@ export class SemanticGraph {
         this.initSVG();
         
         // Loop Idle
-        // d3.timer((elapsed) => {
-         //   this.time = elapsed * 0.001; 
-          //  this.animateIdle(); 
-        // });
+        d3.timer((elapsed) => {
+          this.time = elapsed * 0.001; 
+        this.animateIdle(); 
+         });
 
         // Listener Resize
         window.addEventListener('resize', () => {
