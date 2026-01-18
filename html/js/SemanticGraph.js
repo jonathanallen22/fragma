@@ -24,8 +24,8 @@ export class SemanticGraph {
 
         this.livelli = [0, 0, 0, 0, 0, 0];
         this.LUNGHEZZA_BASE = 0; 
-        this.MOLTIPLICATORE = 2.5; 
-        this.idleSpeed = 0.5; // Velocità animazione idle
+        this.MOLTIPLICATORE = 1.5; 
+        this.idleSpeed = 0; // Velocità animazione idle
         this.time = 0;
 
         // Distribuzione casuale
@@ -48,10 +48,10 @@ export class SemanticGraph {
         this.initSVG();
         
         // Loop Idle
-        d3.timer((elapsed) => {
-            this.time = elapsed * 0.001; 
-            this.animateIdle(); 
-        });
+        // d3.timer((elapsed) => {
+         //   this.time = elapsed * 0.001; 
+          //  this.animateIdle(); 
+        // });
 
         // Listener Resize
         window.addEventListener('resize', () => {
@@ -169,7 +169,7 @@ export class SemanticGraph {
                     somma += (this.livelli[mIdx] * 0.04 * this.MOLTIPLICATORE * 10) + d.jitter;
                 }
             });
-            d.currentLen = this.LUNGHEZZA_BASE + somma;
+            d.currentLen = Math.min(this.LUNGHEZZA_BASE + somma, 220);
         });
 
         this.valueLines.transition().duration(200).ease(d3.easeLinear)
@@ -202,7 +202,7 @@ export class SemanticGraph {
                 const mx = m.x * 0.5, my = m.y * 0.5; // Semplificato per evitare bug calcolo
                 return bundle([[m.x, m.y], [mx, my], [t.x - t.nx * 5, t.y - t.ny * 5]]);
             })
-            .style("opacity", 0).transition().duration(500).style("opacity", 1);
+            .style("opacity", 0).transition().duration(500).style("opacity", 0.6);
 
         links.exit().transition().duration(300).style("opacity", 0).remove();
     }

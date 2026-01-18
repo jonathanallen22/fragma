@@ -120,35 +120,41 @@ body {
    SCENA 6: EDIT MODE (LAYOUT FIX DEFINITIVO)
    ========================================= */
 #scene-edit {
-    height: 110vh; /* Altezza fissa schermo */
-    display: flex;
-    flex-direction: column; /* Pila verticale */
-    /* Padding per non finire sotto l'header o fuori schermo in basso */
-    padding-top: 20vh; 
-    padding-bottom: 2vh;
-    box-sizing: border-box;
-    overflow: hidden; /* Evita scrollbar indesiderate */
+    position: relative; /* Ancora per gli elementi assoluti */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     background: radial-gradient(circle at center, #1a1a1a 0%, #000 90%);
+    /* Rimosso flex, flex-direction, padding, etc. */
 }
 
 /* --- PARTE ALTA: TESTO (Non si schiaccia) --- */
 .edit-text-wrapper { 
-    flex-shrink: 0; /* Impedisce che si rimpicciolisca */
-    width: 80%; margin: 0 auto; text-align: left; z-index: 10; 
-    padding-bottom: 2vh;
+    position: absolute; /* Fisso in alto */
+    top: 15vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%; 
+    text-align: left; 
+    z-index: 10; /* Sopra il grafico */
 }
 #edit-headline { font-family: var(--font-mono); font-size: 2rem; color: white; margin-bottom: 1vh; text-transform: uppercase; line-height: 1.1; }
 .scrolling-body { max-height: 8vh; overflow-y: auto; padding-right: 1rem; border-left: 3px solid var(--accent-color); padding-left: 1rem;}
 #edit-body { font-family: var(--font-mono); font-size: 1rem; color: #ccc; line-height: 1.4; margin: 0; }
 
 /* --- PARTE CENTRALE: GRAFO (Si espande) --- */
-#graph-container { 
-    flex-grow: 1;    /* PUNTO CHIAVE: Occupa tutto lo spazio disponibile al centro */
-    min-height: 0;   /* PUNTO CHIAVE: Permette al contenitore di restringersi se necessario */
-    width: 100%; 
-    display: flex; justify-content: center; align-items: center; /* Centra l'SVG al suo interno */
-    position: relative; z-index: 1; overflow: visible;
-    /* margin: 2vh 0; Spazio sopra e sotto opzionale */
+#graph-container {
+    position: absolute; /* Svincolato dal flusso */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%); /* Centrato (leggermente su per bilanciare i footer) */
+    width: 90vw;  /* Larghezza fissa */
+    height: 70vh; /* Altezza fissa */
+    z-index: 1;   /* Livello base */
+    pointer-events: none; /* Così puoi cliccare sulle cose che ci finiscono sopra */
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
 }
 svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno */
 
@@ -159,8 +165,8 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
     font-weight: 800; text-transform: uppercase; letter-spacing: 0.1rem;
     filter: drop-shadow(0 0 8px black); pointer-events: none;
 }
-.value-line { stroke: #fff; stroke-width: 3px; stroke-linecap: round; opacity: 0.9; filter: drop-shadow(0 0 5px white); }
-.connection { fill: none; stroke: var(--accent-color); stroke-width: 2px; opacity: 0.8; filter: drop-shadow(0 0 8px var(--accent-color)); }
+.value-line { stroke: #fff; stroke-width: 2px; opacity: 0.9; filter: drop-shadow(0 0 5px white); }
+.connection { fill: none; stroke: white; stroke-width: 1px; opacity: 0.6; filter: drop-shadow(0 0 8px var(--accent-color)); }
 
 /* --- PARTE BASSA: FOOTER (Non si schiaccia) --- */
 .edit-footer {
