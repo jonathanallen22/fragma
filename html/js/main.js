@@ -10,6 +10,8 @@ import { ImpactVisualizer } from './ImpactVisualizer.js';
 import { SerialManager } from './SerialManager.js';
 // --- NUOVO IMPORT ---
 import { LLMClient } from './LLMClient.js';
+import { PARAM_DESCRIPTIONS } from './DataManager.js'; // Assicurati del percorso
+
 
 console.log("🚀 Fragma System Init...");
 
@@ -142,7 +144,7 @@ function updateLiveText() {
     const bodyEl = document.getElementById('edit-body');
     const scrollContainer = document.querySelector('.scrolling-body');
     
-    // Recupero i valori correnti (aggiornati da Arduino/Input)
+    // Recupero i valori correnti
     const currentParams = {
         opacita: parseFloat(document.getElementById('param-opacita').value || 0),
         deumanizzazione: parseFloat(document.getElementById('param-deumanizzazione').value || 0),
@@ -151,29 +153,46 @@ function updateLiveText() {
         moralizzazione: parseFloat(document.getElementById('param-moralizzazione').value || 0),
         emotivo: parseFloat(document.getElementById('param-emotivo').value || 0)
     };
+    
+    // 1. IMPOSTIAMO LA SCRITTA DI ATTESA
+    bodyEl.innerText = "Processing..."; 
+    bodyEl.style.opacity = "0.8"; 
+
+    // 2. FLAG PER IL PRIMO DATO
+    let isFirstChunk = true;
 
     // Avvia lo streaming
     llmClient.streamText(
-        originalData.body, // Testo originale (prompt base)
-        currentParams,     // Parametri attuali
+        originalData.body, 
+        currentParams,     
         (chunk) => {
-            // [ON CHUNK]: Arriva un pezzo di testo
+            // [ON CHUNK]: Arrivano i dati veri
+
+            // SE È IL PRIMO PEZZO -> CANCELLA LA SCRITTA "PROCESSING"
+            if (isFirstChunk) {
+                bodyEl.innerText = "";      // Pulisci il DOM solo ora!
+                bodyEl.style.opacity = "1"; // Rimetti opacità piena
+                isFirstChunk = false;       // Flag spento
+            }
+            
             currentGeneratedBody += chunk;
             bodyEl.innerText = currentGeneratedBody; 
             
-            // Auto-scroll fluido verso il basso
             if(scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
         },
         () => {
-            // [ON START]: Inizio generazione
-            currentGeneratedBody = ""; // Reset buffer
-            bodyEl.innerText = "";
-            bodyEl.style.opacity = 0.7 ; // Feedback v sivo "sto pensando"
+            // [ON START]: Inizio connessione
+            currentGeneratedBody = ""; // Resetta SOLO la variabile stringa
+            
+            // --- MODIFICA FONDAMENTALE ---
+            // HO RIMOSSO: bodyEl.innerText = ""; 
+            // Perché se lo lasci qui, cancelli la scritta "Processing" istantaneamente!
         },
         (err) => {
             // [ON ERROR]
             console.error(err);
             bodyEl.innerText = "// ERRORE CONNESSIONE NEURAL //";
+            bodyEl.style.opacity = "1";
         }
     ).then(() => {
         // [ON COMPLETE]
@@ -222,14 +241,22 @@ const handleArduinoData = (data) => {
 const serialMgr = new SerialManager(handleArduinoData);
 
 // 2. Listener sugli Slider (attivati sia da mouse che da Arduino)
+// 2. Listener sugli Slider
 const sliders = document.querySelectorAll('.cyber-range');
 sliders.forEach(slider => slider.addEventListener('input', (e) => {
-    // A. Aggiorna il Grafico D3 (esistente)
-    semanticGraph.updateParams({ [e.target.id.replace('param-', '')]: parseFloat(e.target.value) });
+    const paramId = e.target.id.replace('param-', '');
+
+    // A. Aggiorna il Grafico D3
+    semanticGraph.updateParams({ [paramId]: parseFloat(e.target.value) });
     
-    // B. Aggiorna il Testo con l'AI (nuovo)
+    // B. Aggiorna la Descrizione del Parametro (NUOVO)
+    updateParamInfoDisplay(paramId);
+    
+    // C. Aggiorna il Testo con l'AI
     updateLiveText();
 }));
+
+
 
 
 // --- CONTROLLO FLUSSO (SCENE) ---
@@ -336,5 +363,47 @@ function prepareImpactScene(title, body) {
     impactViz.visualizeImpact(params);
 }
 
+//spiegazione parametri
+
+// --- FUNZIONI HELPER ---
+
+let paramInfoTimeout; // Variabile per gestire il nascondiglio automatico
+
+function updateParamInfoDisplay(paramId) {
+    const container = document.getElementById('param-info-container');
+    const titleEl = document.getElementById('param-info-title');
+    const descEl = document.getElementById('param-info-desc');
+    
+    const info = PARAM_DESCRIPTIONS[paramId];
+    
+    if (info) {
+        titleEl.innerText = info.title;
+        descEl.innerText = info.description;
+        
+        // Mostra il contenitore
+        container.classList.remove('hidden');
+        
+        // Resetta il timeout precedente se esiste
+        if (paramInfoTimeout) clearTimeout(paramInfoTimeout);
+        
+        // Nascondi di nuovo dopo qualche secondo di inattività (opzionale ma carino)
+        paramInfoTimeout = setTimeout(() => {
+            container.classList.add('hidden');
+        }, 1000000); // Nascondi dopo 5 secondi
+    }
+}
+
 const btnRestart = document.getElementById('btn-restart');
 if (btnRestart) btnRestart.addEventListener('click', () => location.reload());
+
+// --- TOGGLE GUI (DEBUG) ---
+document.addEventListener('keydown', (e) => {
+    // Premi 'H' per nascondere/mostrare gli slider
+    if (e.key.toLowerCase() === 'h') {
+        const sceneEdit = document.getElementById('scene-edit');
+        if (sceneEdit) {
+            sceneEdit.classList.toggle('gui-hidden');
+            console.log("GUI Visibility:", !sceneEdit.classList.contains('gui-hidden'));
+        }
+    }
+});

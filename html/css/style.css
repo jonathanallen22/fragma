@@ -113,8 +113,8 @@ body {
 .newspaper-headline { font-family: 'Times New Roman', serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 2rem; margin-top: 0; }
 .newspaper-body { font-family: var(--font-hoves); font-size: 1.3rem; line-height: 1.5; color: #ccc; text-align: justify; margin: 0; }
 
-.carousel-footer { position: absolute; bottom: 5vh; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-.knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.5rem; letter-spacing: 0.2rem; }
+.carousel-footer { position: absolute; bottom: 4%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.2rem; letter-spacing: 0.2rem; }
 
 /* =========================================
    SCENA 6: EDIT MODE (LAYOUT FIX DEFINITIVO)
@@ -147,7 +147,7 @@ body {
     position: absolute; /* Svincolato dal flusso */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -30%); /* Centrato (leggermente su per bilanciare i footer) */
+    transform: translate(-50%, -45%); /* Centrato (leggermente su per bilanciare i footer) */
     width: 90vw;  /* Larghezza fissa */
     height: 70vh; /* Altezza fissa */
     z-index: 1;   /* Livello base */
@@ -168,14 +168,9 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 .value-line { stroke: #fff; stroke-width: 2px; opacity: 0.9; /*filter: drop-shadow(0 0 5px white); */}
 .connection { fill: none; stroke: white; stroke-width: 1px; opacity: 0.6; /*filter: drop-shadow(0 0 8px var(--accent-color)); */}
 
+
 /* --- PARTE BASSA: FOOTER (Non si schiaccia) --- */
-.edit-footer {
-    flex-shrink: 0; /* Impedisce che si rimpicciolisca */
-    width: 100%; 
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-    z-index: 50;
-    transform: translate(0%, 550%);
-}
+
 
 /* Sliders */
 .temp-controls {
@@ -189,13 +184,65 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 .cyber-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: white; border: 2px solid var(--accent-color); border-radius: 50%; cursor: pointer; box-shadow: 0 0 5px var(--accent-color); }
 
 /* Pedina (Mini Totem) con spazio adeguato */
-.footer-decoration { 
-    display: flex; flex-direction: column; align-items: center; 
-    margin-top: 3vh; /* SPAZIO IMPORTANTE tra sliders e pedina */
-    padding-bottom: 3vh;
+#pedina{
+    scale: 0.4;
+    position: absolute;
+    top: -530% ;
 }
-.pedine-label { font-family: var(--font-mono); color: #666; font-size: 0.7rem; letter-spacing: 0.2rem; margin-bottom: 1vh; text-transform: uppercase; font-weight: bold; }
+
+
 #mini-totem-container { width: 120px; height: 140px; position: relative; z-index: 101; filter: drop-shadow(0 0 20px rgba(255, 72, 36, 0.3)); }
+
+/*spiegazione parametri modificati stile
+
+/* --- STILI PER LA DESCRIZIONE DEL PARAMETRO --- */
+#param-info-container {
+    position: absolute;
+    /* 50% è il centro esatto dello schermo. 
+       72% lo sposta sotto il grafico, ma prima degli slider. 
+       Aggiusta questo numero se serve (es. 65% o 75%) */
+    top: 78%; 
+    left: 50%;
+    transform: translateX(-50%); /* Centra orizzontalmente */
+    
+    width: 60vw; /* Larghezza massima per evitare righe lunghissime */
+    text-align: center;
+    z-index: 20; /* Sopra al grafico se dovesse sovrapporsi */
+    
+    pointer-events: none; /* IMPORTANTE: Così se ci finisce il mouse sopra, puoi cliccare quello che c'è sotto */
+    transition: opacity 0.3s ease;
+    padding-bottom: 1%;
+}
+
+/* Quando è nascosto */
+#param-info-container.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px); /* Piccolo effetto salita quando appare */
+}
+
+/* Stili del Testo */
+#param-info-title {
+    font-family: 'TT Hoves Pro Trial';
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: white; /* Arancione Sci-Fi */
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+    text-shadow: 0 0 10px rgba(255, 72, 36, 0.3); /* Leggero glow */
+}
+
+#param-info-desc {
+    font-family: 'TT Hoves Pro Trial'; /* Font tecnico */
+    font-size: 1.5rem;
+    font-weight: 200;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.4;
+    background: rgba(0, 0, 0, 0.6); /* Sfondo semitrasparente per leggere meglio sopra le righe del grafico */
+    border-radius: 4px;
+    display: inline-block; /* Il box nero si adatta al testo */
+    letter-spacing: 0.2rem;
+}
 
 /* =========================================
    SCENA 5: PROCESSING (STRIPES)
@@ -472,3 +519,18 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 .card.is-twitter:hover .tw-icon:nth-child(1):hover { fill: #1d9bf0; background: rgba(29,155,240,0.1); border-radius: 50%; } 
 .card.is-twitter:hover .tw-icon:nth-child(2):hover { fill: #00ba7c; background: rgba(0,186,124,0.1); border-radius: 50%; } 
 .card.is-twitter:hover .tw-icon:nth-child(3):hover { fill: #f91880; background: rgba(249,24,128,0.1); border-radius: 50%; }
+
+/* Aggiungi questo alla fine del CSS */
+
+/* Stato quando la GUI è nascosta */
+.gui-hidden , 
+.gui-hidden .temp-controls {
+    opacity: 0;
+    transform: translateY(50px); /* Scivola giù */
+    pointer-events: none; /* Disattiva i click quando invisibile */
+}
+
+/* Assicuriamoci che la transizione sia fluida sull'elemento originale */
+.edit-footer {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}

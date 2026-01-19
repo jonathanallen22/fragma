@@ -127,3 +127,32 @@ export const CARDS_DATA = [
 export function getCardById(id) {
     return CARDS_DATA.find(card => card.id === id);
 }
+
+// js/ParamDescriptions.js
+
+export const PARAM_DESCRIPTIONS = {
+    'opacita': {
+        title: 'Opacità',
+        description: 'Aumentando l\'opacità rendi il testo più criptico e di difficile interpretazione, nascondendo il significato diretto.'
+    },
+    'deumanizzazione': {
+        title: 'Deumanizzazione',
+        description: 'Aumentando la deumanizzazione rimuovi elementi emotivi e personali, rendendo il tono freddo, distaccato e meccanico.'
+    },
+    'polarizzazione': {
+        title: 'Polarizzazione',
+        description: 'Aumentando la polarizzazione estremizzi le opinioni, dividendo nettamente i concetti in opposti senza sfumature.'
+    },
+    'assertivita': {
+        title: 'Assertività',
+        description: 'Aumentando l’assertività stai aumentando il livello di imposizione della notizia al lettore, influenzando la percezione con un tono deciso e indiscutibile.'
+    },
+    'moralizzazione': {
+        title: 'Moralizzazione',
+        description: 'Aumentando la moralizzazione introduci giudizi di valore etico, inquadrando i fatti in una prospettiva di giusto o sbagliato.'
+    },
+    'emotivo': {
+        title: 'Carico Emotivo',
+        description: 'Aumentando il carico emotivo intensifichi i sentimenti espressi nel testo, cercando di suscitare una forte reazione nel lettore.'
+    }
+};

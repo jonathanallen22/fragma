@@ -51,7 +51,7 @@ export class MiniTotem {
                 this.model = gltf.scene;
                 
                 // 1. SCALA: Lo rimpicciolisco leggermente per sicurezza (da 12 a 10)
-                this.model.scale.set(50, 50, 50);
+                this.model.scale.set(45, 45, 45);
 
                 // 2. POSIZIONE: Lo alzo! Prima era -10, ora 0 o +5 per non tagliarlo sotto
                 this.model.position.y = -5; 

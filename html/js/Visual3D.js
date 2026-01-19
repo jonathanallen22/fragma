@@ -90,7 +90,7 @@ loadModel() {
                     // Se lo vuoi arancio metti: 0xff4824
                     const edgesMaterial = new THREE.LineBasicMaterial({ 
                         color: 0xffffff, // O prova 0x00ffff (Ciano)
-                        linewidth: 2     // Nota: su Chrome Windows le linee restano spesso a 1px per limiti del browser
+                        linewidth: 1     // Nota: su Chrome Windows le linee restano spesso a 1px per limiti del browser
                     });
                     
                     const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
@@ -98,7 +98,7 @@ loadModel() {
                 }
             });
 
-            const scale = 2; 
+            const scale = 1; 
             this.model.scale.set(scale, scale, scale);
             this.model.position.y = -2; 
 
