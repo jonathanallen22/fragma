@@ -25,7 +25,7 @@ export class SemanticGraph {
         this.livelli = [0, 0, 0, 0, 0, 0];
         this.LUNGHEZZA_BASE = 0; 
         this.MOLTIPLICATORE = 1.5; 
-        this.idleSpeed = 0.5; // Velocità animazione idle
+        this.idleSpeed = 0.5; 
         this.time = 0;
 
         // Distribuzione casuale
@@ -38,20 +38,24 @@ export class SemanticGraph {
             return targets;
         });
 
-        // Dataset iniziale
+        // Dataset iniziale con supporto per Easing (Lerp)
         this.dataset = this.listaParametri.map((p, i) => ({
-            nome: p, id: i, jitter: Math.random() * 10, currentLen: this.LUNGHEZZA_BASE,
+            nome: p, 
+            id: i, 
+            jitter: Math.random() * 10, 
+            currentLen: this.LUNGHEZZA_BASE,
+            targetLen: this.LUNGHEZZA_BASE, // Valore obiettivo per l'animazione
             x:0, y:0, nx:0, ny:0, angle:0 
         }));
 
         // --- AVVIO ---
         this.initSVG();
         
-        // Loop Idle
+        // Loop Idle + Lerp Animation
         d3.timer((elapsed) => {
-          this.time = elapsed * 0.001; 
-        this.animateIdle(); 
-         });
+            this.time = elapsed * 0.001; 
+            this.animateIdle(); 
+        });
 
         // Listener Resize
         window.addEventListener('resize', () => {
@@ -99,7 +103,6 @@ export class SemanticGraph {
         });
 
         this.drawStaticElements();
-        this.updateVisuals();
     }
 
     drawStaticElements() {
@@ -169,17 +172,14 @@ export class SemanticGraph {
                     somma += (this.livelli[mIdx] * 0.04 * this.MOLTIPLICATORE * 10) + d.jitter;
                 }
             });
-            d.currentLen = Math.min(this.LUNGHEZZA_BASE + somma, 220);
+            // Settiamo il target, non la lunghezza corrente
+            d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 220);
         });
 
-        this.valueLines.transition().duration(200).ease(d3.easeLinear)
-            .attr("x2", d => d.lx + d.nx * d.currentLen)
-            .attr("y2", d => d.ly + d.ny * d.currentLen);
-
+        // Gestione macro text e ragnatela (logica discreta)
         this.mainGroup.selectAll(".macro-text").transition().duration(300)
             .style("fill", (d, i) => this.livelli[i] > 10 ? "#ffffffb3" : "#444");
 
-        // Ragnatela
         const activeLinks = [];
         this.macroOwnership.forEach((targets, mIdx) => {
             const liv = this.livelli[mIdx];
@@ -191,90 +191,63 @@ export class SemanticGraph {
             }
         });
 
-        const bundle = d3.line().curve(d3.curveBundle.beta(0.85));
         const links = this.mainGroup.selectAll(".connection").data(activeLinks, d => d.id);
+        const bundle = d3.line().curve(d3.curveBundle.beta(0.85));
 
         links.enter().append("path")
             .attr("class", "connection")
-            .attr("d", d => {
-                const t = this.dataset[d.tIdx];
-                const m = this.hexVertices[d.mIdx];
-                const mx = m.x * 0.5, my = m.y * 0.5; // Semplificato per evitare bug calcolo
-                return bundle([[m.x, m.y], [mx, my], [t.x - t.nx * 5, t.y - t.ny * 5]]);
-            })
             .style("opacity", 0).transition().duration(500).style("opacity", 0.6);
 
         links.exit().transition().duration(300).style("opacity", 0).remove();
     }
 
     animateIdle() {
-        // Se non ci sono linee, esci
         if (!this.valueLines || this.valueLines.empty()) return;
 
-        // Recuperiamo i valori dai livelli (0-100 convertiti in 0.0-1.0)
         const emotivo = this.livelli[5] / 100;      
         const assertivita = this.livelli[3] / 100;
-        
-        // 1. SETTAGGI TEMPO E AMPIEZZA
-        // Rallentiamo il tempo per un respiro lento (0.6 è un buon mix)
         const timeFactor = this.time * 0.6; 
-        
-        // Ampiezza molto contenuta per le linee dritte
         const lineAmplitude = 0.5 + (emotivo * 1.5);
 
-        // --- 2. ANIMAZIONE LINEE DRITTE (Istogrammi) ---
+        // --- LERP FACTOR (Velocità Ease) ---
+        // 0.05 = Molto lento e pesante
+        // 0.1  = Bilanciato (consigliato)
+        // 0.2  = Reattivo
+        const lerpFactor = 0.1;
+
+        // --- AGGIORNAMENTO LINEE (Istogrammi) ---
         this.valueLines
             .attr("x2", d => {
-                // Calcoliamo il rumore (Onda dolce)
+                // Inseguimento fluido del target
+                d.currentLen += (d.targetLen - d.currentLen) * lerpFactor;
+                
                 const noise = Math.sin(timeFactor + d.id/5) * lineAmplitude;
                 let finalLen = d.currentLen + noise;
-                if (finalLen < 0) finalLen = 0; // Evita inversione
-                
-                // Muoviamo SOLO la punta (x2), l'origine (x1) resta ferma
+                if (finalLen < 0) finalLen = 0;
                 return d.lx + d.nx * finalLen;
             })
             .attr("y2", d => {
                 const noise = Math.sin(timeFactor + d.id/5) * lineAmplitude;
                 let finalLen = d.currentLen + noise;
                 if (finalLen < 0) finalLen = 0;
-
                 return d.ly + d.ny * finalLen;
             });
 
-        // --- 3. ANIMAZIONE RAGNATELA (Curve) ---
-        // La beta controlla quanto è stretta la curva (più alta = più stretta)
+        // --- AGGIORNAMENTO RAGNATELA ---
         const bundle = d3.line().curve(d3.curveBundle.beta(0.85 + (assertivita * 0.15)));
         
         this.mainGroup.selectAll(".connection")
             .attr("d", d => {
-                const t = this.dataset[d.tIdx]; // Target (Testo)
-                const m = this.hexVertices[d.mIdx]; // Macro (Vertice Esagono)
-
-                // --- PUNTO A: ORIGINE (Vertice Esagono) ---
-                // ASSOLUTAMENTE FISSO
-                const startX = m.x;
-                const startY = m.y;
-
-                // --- PUNTO C: DESTINAZIONE (Testo) ---
-                // ASSOLUTAMENTE FISSO (Ho rimosso il Math.random che avevi qui)
-                const endX = t.x - t.nx * 5;
-                const endY = t.y - t.ny * 5;
-
-                // --- PUNTO B: CONTROLLO CENTRALE (La "Pancia" della curva) ---
-                // Questo punto non viene disegnato, ma "tira" la linea verso il centro.
-                // Facendolo orbitare, creiamo il movimento senza staccare gli estremi.
+                const t = this.dataset[d.tIdx];
+                const m = this.hexVertices[d.mIdx];
                 
-                const speed = 0.3+ (emotivo * 2);
-                // L'ampiezza del movimento centrale
+                const speed = 0.3 + (emotivo * 2);
                 const centerAmp = this.hexSize * 0.3 * (1 - assertivita * 0.5); 
-                
-                // Calcolo orbita centrale
-                const mx = Math.cos(d.k + d.mIdx + timeFactor * speed) * centerAmp;
-                const my = Math.sin(d.k + d.mIdx + timeFactor * speed) * centerAmp;
+                const mx = Math.cos(d.k + d.mIdx + this.time * speed) * centerAmp;
+                const my = Math.sin(d.k + d.mIdx + this.time * speed) * centerAmp;
 
-                // Passiamo i 3 punti al bundle: Start -> Controllo -> End
-                return bundle([[startX, startY], [mx, my], [endX, endY]]);
+                return bundle([[m.x, m.y], [mx, my], [t.x - t.nx * 5, t.y - t.ny * 5]]);
             })
-            .style("stroke-opacity", 0.4 + Math.sin(timeFactor * 1.5) * 0.2); // Pulsazione luce
+            .style("stroke-opacity", 0.4 + Math.sin(this.time * 1.5) * 0.2);
     }
 }
