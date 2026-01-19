@@ -131,7 +131,7 @@ body {
 /* --- PARTE ALTA: TESTO (Non si schiaccia) --- */
 .edit-text-wrapper { 
     position: absolute; /* Fisso in alto */
-    top: 15vh;
+    top: 10vh;
     left: 50%;
     transform: translateX(-50%);
     width: 80%; 

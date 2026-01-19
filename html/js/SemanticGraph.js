@@ -208,36 +208,73 @@ export class SemanticGraph {
     }
 
     animateIdle() {
-        if (!this.valueLines) return;
-        const emotivo = this.livelli[5] / 100; 
-        const assertivita = this.livelli[3] / 100;
-        const timeFactor = this.time * this.idleSpeed; 
+        // Se non ci sono linee, esci
+        if (!this.valueLines || this.valueLines.empty()) return;
 
-        // 1. LINEE
+        // Recuperiamo i valori dai livelli (0-100 convertiti in 0.0-1.0)
+        const emotivo = this.livelli[5] / 100;      
+        const assertivita = this.livelli[3] / 100;
+        
+        // 1. SETTAGGI TEMPO E AMPIEZZA
+        // Rallentiamo il tempo per un respiro lento (0.6 è un buon mix)
+        const timeFactor = this.time * 0.6; 
+        
+        // Ampiezza molto contenuta per le linee dritte
+        const lineAmplitude = 0.5 + (emotivo * 1.5);
+
+        // --- 2. ANIMAZIONE LINEE DRITTE (Istogrammi) ---
         this.valueLines
             .attr("x2", d => {
-                const noise = Math.sin(timeFactor * 2 + d.id) * (2 + emotivo * 5); 
-                return d.lx + d.nx * (d.currentLen + noise);
+                // Calcoliamo il rumore (Onda dolce)
+                const noise = Math.sin(timeFactor + d.id/5) * lineAmplitude;
+                let finalLen = d.currentLen + noise;
+                if (finalLen < 0) finalLen = 0; // Evita inversione
+                
+                // Muoviamo SOLO la punta (x2), l'origine (x1) resta ferma
+                return d.lx + d.nx * finalLen;
             })
             .attr("y2", d => {
-                const noise = Math.sin(timeFactor * 2 + d.id) * (2 + emotivo * 5);
-                return d.ly + d.ny * (d.currentLen + noise);
+                const noise = Math.sin(timeFactor + d.id/5) * lineAmplitude;
+                let finalLen = d.currentLen + noise;
+                if (finalLen < 0) finalLen = 0;
+
+                return d.ly + d.ny * finalLen;
             });
 
-        // 2. RAGNATELA
+        // --- 3. ANIMAZIONE RAGNATELA (Curve) ---
+        // La beta controlla quanto è stretta la curva (più alta = più stretta)
         const bundle = d3.line().curve(d3.curveBundle.beta(0.85 + (assertivita * 0.15)));
+        
         this.mainGroup.selectAll(".connection")
             .attr("d", d => {
-                const t = this.dataset[d.tIdx];
-                const m = this.hexVertices[d.mIdx];
-                const speed = 0.5 + (emotivo * 2);
-                const amplitude = this.hexSize * 0.3 * (1 - assertivita * 0.5); 
-                const mx = Math.cos(d.k + d.mIdx + timeFactor * speed) * amplitude;
-                const my = Math.sin(d.k + d.mIdx + timeFactor * speed) * amplitude;
-                const tx = (t.x - t.nx * 5) + (Math.random()-0.5) * (emotivo * 2);
-                const ty = (t.y - t.ny * 5) + (Math.random()-0.5) * (emotivo * 2);
-                return bundle([[m.x, m.y], [mx, my], [tx, ty]]);
+                const t = this.dataset[d.tIdx]; // Target (Testo)
+                const m = this.hexVertices[d.mIdx]; // Macro (Vertice Esagono)
+
+                // --- PUNTO A: ORIGINE (Vertice Esagono) ---
+                // ASSOLUTAMENTE FISSO
+                const startX = m.x;
+                const startY = m.y;
+
+                // --- PUNTO C: DESTINAZIONE (Testo) ---
+                // ASSOLUTAMENTE FISSO (Ho rimosso il Math.random che avevi qui)
+                const endX = t.x - t.nx * 5;
+                const endY = t.y - t.ny * 5;
+
+                // --- PUNTO B: CONTROLLO CENTRALE (La "Pancia" della curva) ---
+                // Questo punto non viene disegnato, ma "tira" la linea verso il centro.
+                // Facendolo orbitare, creiamo il movimento senza staccare gli estremi.
+                
+                const speed = 0.3+ (emotivo * 2);
+                // L'ampiezza del movimento centrale
+                const centerAmp = this.hexSize * 0.3 * (1 - assertivita * 0.5); 
+                
+                // Calcolo orbita centrale
+                const mx = Math.cos(d.k + d.mIdx + timeFactor * speed) * centerAmp;
+                const my = Math.sin(d.k + d.mIdx + timeFactor * speed) * centerAmp;
+
+                // Passiamo i 3 punti al bundle: Start -> Controllo -> End
+                return bundle([[startX, startY], [mx, my], [endX, endY]]);
             })
-            .style("stroke-opacity", 0.6 + Math.sin(timeFactor * 3) * 0.2);
+            .style("stroke-opacity", 0.4 + Math.sin(timeFactor * 1.5) * 0.2); // Pulsazione luce
     }
 }
