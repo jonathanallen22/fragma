@@ -98,7 +98,7 @@ loadModel() {
                 }
             });
 
-            const scale = 1; 
+            const scale = 1.4; 
             this.model.scale.set(scale, scale, scale);
             this.model.position.y = -2; 
 

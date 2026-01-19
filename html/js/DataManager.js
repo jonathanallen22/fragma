@@ -6,8 +6,8 @@ export const CARDS_DATA = [
         source: "Corriere della Sera",
         date: "2 Dicembre 2025",
         author: "Di Alessia Conzonato",
-        headline: "Reddito reale, Italia e Grecia sono gli unici due paesi Ue dove le famiglie sono più povere di vent’anni fa",
-        body: "L’Italia e la Grecia sono gli unici due Paesi dell’Unione europea dove il reddito reale delle famiglie è diminuito negli ultimi venti anni: rispettivamente a -4% e -5% nel periodo considerato dalle stime di Eurostat.",
+        headline: "Migranti, ancora sbarchi a Lampedusa. Nel porto dell'isola più della metà degli arrivi di tutta Italia",
+        body: "Lampedusa si conferma primo porto di sbarco di migranti in Italia. I barchini continuano ad arrivare senza soluzione di continuità, l'ultimo oggi pomeriggio, il dodicesimo dall'inizio dell'anno, tutte piccole imbarcazioni con pochi migranti a bordo.Come quello arrivato oggi pomeriggio con undici persone a bordo, dieci adulti e un bambino.",
         logo: "assets/images/corriere.svg"
     },
     {
@@ -16,8 +16,8 @@ export const CARDS_DATA = [
         source: " SkyTG24",
         date: "07 DICEMBRE 2025",
         author: "REDAZIONE ESTERI",
-        headline: "Gaza, Netanyahu: Ci sono opportunità di pace, presto fase 2. Herzog a New York",
-        body: "Hamas si dice pronto a discutere di 'congelare o immagazzinare' il suo arsenale di armi come parte del cessate il fuoco con Israele, afferma un alto funzionario. Il premier israeliano Benjamin Netanyahu ha riferito che si aprono opportunità.",
+        headline: "Le cose da sapere sull’attacco di Hamas e sulla risposta di Israele",
+        body: "La mattina di sabato 7 ottobre, all’alba, il gruppo radicale palestinese Hamas, che governa la Striscia di Gaza, ha iniziato una complessa operazione via mare, via terra e via aria contro Israele. È stato un attacco senza precedenti, per estensione dell’operazione, per numero di persone uccise e per il modo in cui è stato compiuto. All’attacco di Hamas, Israele ha risposto in una maniera estremamente violenta: tra le altre cose ha iniziato a bombardare la Striscia come non aveva mai fatto prima e ha espresso la sua intenzione di iniziare un’invasione di terra per eliminare del tutto Hamas, che potrebbe avere conseguenze catastrofiche per i civili di Gaza.",
         logo: "assets/images/sky.svg"
     },
     {
@@ -25,9 +25,9 @@ export const CARDS_DATA = [
         source: "BBC News",
         template: "twitter",
         date: "09 DICEMBRE 2025",
-        author: "Donald Trump",
-        headline: "L'Intelligenza Artificiale supera il test di Turing in diretta globale",
-        body: "Un evento senza precedenti ha scosso la comunità scientifica ieri sera quando il modello Syntax-F1 ha conversato per 4 ore con una giuria di filosofi senza essere distinto da un umano, segnando una nuova era.",
+        author: "Giorgia Meloni",
+        headline: "",
+        body: "Sacrosanta la decisione della Corte costituzionale di dichiarare inammissibile il referendum proposto dai radicali sull’omicidio del consenziente, anche se sano. Un quesito inaccettabile ed estremo che avrebbe scardinato il nostro ordinamento giuridico, da sempre orientato alla difesa della vita umana e alla tutela dei più fragili e deboli. Una sentenza di buon senso. C’è ancora spazio nel nostro ordinamento per difendere il valore della vita, come Fratelli d’Italia intende fare con il suo impegno",
         logo: "assets/images/x.svg"
     },
     
