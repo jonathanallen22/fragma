@@ -5,12 +5,12 @@ import { Visual3D } from './Visual3D.js';
 import { MiniTotem } from './MiniTotem.js'; 
 import { CARDS_DATA } from './DataManager.js';
 import { SemanticGraph } from './SemanticGraph.js';
+import { TextScrambler } from './TextScrambler.js'; 
 import { ImpactVisualizer } from './ImpactVisualizer.js'; 
 import { SerialManager } from './SerialManager.js';
 // --- NUOVO IMPORT ---
 import { LLMClient } from './LLMClient.js';
 import { PARAM_DESCRIPTIONS } from './DataManager.js'; // Assicurati del percorso
-import { Impact3DManager } from './Impact3DManager.js';
 
 
 console.log("🚀 Fragma System Init...");
@@ -21,19 +21,10 @@ const semanticGraph = new SemanticGraph('graph-container');
 const visuals = new Visual3D('canvas-container-intro');
 const miniTotem = new MiniTotem('mini-totem-container'); 
 const impactViz = new ImpactVisualizer('viz-brain');
-const impactManagerV2 = new Impact3DManager();
-const impactHero = document.getElementById('impact-hero');
-const impactHeroClose = document.getElementById('impact-hero-close');
 
 // Client per la generazione AI (Punta al backend Python)
 const llmClient = new LLMClient("http://localhost:5001/generate");
 let currentGeneratedBody = ""; // Variabile per accumulare il testo in arrivo
-
-if (impactHeroClose && impactHero) {
-    impactHeroClose.addEventListener('click', () => {
-        impactHero.classList.add('hidden-banner');
-    });
-}
 
 // --- CAROSELLO ---
 const carouselTrack = document.getElementById('carousel-track');
@@ -249,25 +240,8 @@ const handleArduinoData = (data) => {
 
 const serialMgr = new SerialManager(handleArduinoData);
 
-// Funzione per aggiornare la descrizione del parametro
-function updateParamInfoDisplay(paramId) {
-    const container = document.getElementById('param-info-container');
-    const titleEl = document.getElementById('param-info-title');
-    const descEl = document.getElementById('param-info-desc');
-    
-    if (!container || !titleEl || !descEl) return;
-    
-    const description = PARAM_DESCRIPTIONS[paramId];
-    if (description) {
-        titleEl.innerText = description.title;
-        descEl.innerText = description.description;
-        container.classList.remove('hidden');
-    } else {
-        container.classList.add('hidden');
-    }
-}
-
 // 2. Listener sugli Slider (attivati sia da mouse che da Arduino)
+// 2. Listener sugli Slider
 const sliders = document.querySelectorAll('.cyber-range');
 sliders.forEach(slider => slider.addEventListener('input', (e) => {
     const paramId = e.target.id.replace('param-', '');
@@ -275,7 +249,7 @@ sliders.forEach(slider => slider.addEventListener('input', (e) => {
     // A. Aggiorna il Grafico D3
     semanticGraph.updateParams({ [paramId]: parseFloat(e.target.value) });
     
-    // B. Aggiorna la Descrizione del Parametro
+    // B. Aggiorna la Descrizione del Parametro (NUOVO)
     updateParamInfoDisplay(paramId);
     
     // C. Aggiorna il Testo con l'AI
@@ -287,10 +261,8 @@ sliders.forEach(slider => slider.addEventListener('input', (e) => {
 
 // --- CONTROLLO FLUSSO (SCENE) ---
 
-// --- CONTROLLO FLUSSO (SCENE) ---
-
 document.addEventListener('keydown', (e) => {
-    if (e.key.toLowerCase() === 'c') serialMgr.connect(); 
+    if (e.key.toLowerCase() === 'c') serialMgr.connect(); // Tasto 'c' per connettere Arduino
 
     // Navigazione tastiera Carosello
     if (sceneMgr.currentScene === 'carousel') {
@@ -306,139 +278,132 @@ document.addEventListener('keydown', (e) => {
 }); 
 
 function handleConfirmation() {
-    console.log("Handle Confirmation in scene:", sceneMgr.currentScene); // Debug
-
     // 1. INTRO -> ISTRUZIONI
     if (sceneMgr.currentScene === 'intro') {
         sceneMgr.goTo('instructions');
     }
     
-    // 2. CAROSELLO -> EDIT
     else if (sceneMgr.currentScene === 'carousel') {
          const selectedData = CARDS_DATA[currentCardIndex];
          
+         // Setta il titolo
          document.getElementById('edit-headline').innerText = selectedData.headline;
+         
+         // --- MODIFICA QUI ---
+         // Invece della frase "Inizializzazione...", metti subito il corpo originale
          document.getElementById('edit-body').innerText = selectedData.body;
          
          sceneMgr.goTo('edit'); 
          
          setTimeout(() => { 
-             if(semanticGraph && typeof semanticGraph.resize === 'function') {
-                 semanticGraph.resize(); 
-             }
-             // updateLiveText(); // Scommenta se vuoi che parta subito
+             if(semanticGraph) semanticGraph.resize(); 
+             
+             // DOMANDA STRATEGICA:
+             // Vuoi che l'AI parta subito a riscrivere appena entri (anche se non hai toccato nulla)?
+             // Se SÌ, lascia questa riga:
+             updateLiveText(); 
+             
+             // Se invece vuoi che il testo rimanga quello originale FINCHÉ non tocchi uno slider,
+             // COMMENTA o CANCELLA la riga sopra (updateLiveText).
         }, 600);
     }
     
-    // 3. EDIT -> IMPACT V2
+    // 3. EDIT -> IMPACT (Salta Processing)
     else if (sceneMgr.currentScene === 'edit') {
         finalizeExperience();
     }
     
-    // 4. IMPACT V2 -> RESTART
-    else if (sceneMgr.currentScene === 'impact-v2' || sceneMgr.currentScene === 'impact') {
+    // 4. IMPACT -> RESTART
+    else if (sceneMgr.currentScene === 'impact') {
         location.reload(); 
     }
 }
 
 /**
- * Funzione Modificata:
- * 1. Prepara il testo (DOM)
- * 2. Cambia Scena (rende visibile il div)
- * 3. Aspetta 100ms
- * 4. Disegna i grafici 3D (ora che il div ha larghezza > 0)
+ * Funzione che sostituisce la vecchia "startProcessing".
+ * Prende il testo generato dall'LLM e prepara la dashboard finale.
  */
 function finalizeExperience() {
-    console.log("--- FINALIZING EXPERIENCE START ---");
-    
     const currentHeadline = document.getElementById('edit-headline').innerText;
+    
+    // Usa il testo generato dall'AI. Se vuoto (errore), usa quello che c'è nel DOM.
     const finalBody = currentGeneratedBody || document.getElementById('edit-body').innerText;
 
-    // A. Prepara l'HTML
-    prepareImpactDom(currentHeadline, finalBody);
+    // Prepara la scena Impact
+    prepareImpactScene(currentHeadline, finalBody);
     
-    // B. DEBUG & FORZATURA CAMBIO SCENA
-    const nextScene = document.getElementById('scene-impact-v2');
-    
-    if (nextScene) {
-        console.log("✅ SCENE ELEMENT FOUND. Switching manually...");
-        
-        // 1. Nascondi tutte le scene
-        document.querySelectorAll('.scene').forEach(el => {
-            el.classList.remove('active');
-            el.classList.add('hidden');
-        });
-
-        // 2. Mostra quella nuova
-        nextScene.classList.remove('hidden');
-        nextScene.classList.add('active');
-        
-        // 3. Aggiorna manualmente il SceneManager
-        sceneMgr.currentScene = 'impact-v2'; 
-    } else {
-        console.error("❌ FATAL ERROR: Element #scene-impact-v2 NOT FOUND in DOM!");
-        console.log("Check your index.html file. Did you save it?");
-        return; // Stop here
-    }
-
-    // C. Inizializza il 3D con ritardo
-    setTimeout(() => {
-        initImpact3D();
-    }, 100);
+    // Vai diretto
+    sceneMgr.goTo('impact');
 }
 
-// Funzione che gestisce SOLO l'HTML (Clonazione card e testi)
-function prepareImpactDom(title, body) {
-    const originalCard = document.querySelector('.card.active');
-    const finalContainer = document.getElementById('final-article-content');
+function prepareImpactScene(title, body) {
+    // Aggiorna DOM Impact
+    const finalHead = document.getElementById('final-headline');
+    const finalBodyText = document.getElementById('final-body');
     
-    if (originalCard && finalContainer) {
-        try {
-            const clone = originalCard.cloneNode(true);
-            
-            // Pulisci stile per la versione finale
-            clone.style.transform = "none";
-            clone.style.opacity = "1";
-            clone.style.filter = "none";
-            clone.style.width = "100%";
-            clone.style.height = "auto";
-            clone.style.border = "none";
-            clone.style.background = "transparent";
+    if(finalHead) {
+        finalHead.innerText = title;
+        finalHead.setAttribute('data-text', title);
+    }
+    if(finalBodyText) {
+        finalBodyText.innerText = body;
+    }
 
-            // Aggiorna il testo
-            const bodyEl = clone.querySelector('.corriere-body, .sky-body, .twitter-body');
-            if(bodyEl) bodyEl.innerText = body;
+    // Calcola parametri finali per visualizzazioni (Cervello, Grafici)
+    const params = {
+        opacita: parseFloat(document.getElementById('param-opacita').value || 0),
+        deumanizzazione: parseFloat(document.getElementById('param-deumanizzazione').value || 0),
+        polarizzazione: parseFloat(document.getElementById('param-polarizzazione').value || 0),
+        assertivita: parseFloat(document.getElementById('param-assertivita').value || 0),
+        moralizzazione: parseFloat(document.getElementById('param-moralizzazione').value || 0),
+        emotivo: parseFloat(document.getElementById('param-emotivo').value || 0)
+    };
+    
+    // Lancia animazioni D3/GSAP nella scena finale
+    impactViz.visualizeImpact(params);
+}
 
-            finalContainer.innerHTML = '';
-            finalContainer.appendChild(clone);
-        } catch(e) {
-            console.error("Errore clone card:", e);
+//spiegazione parametri
+
+// --- FUNZIONI HELPER ---
+
+let paramInfoTimeout; // Variabile per gestire il nascondiglio automatico
+
+function updateParamInfoDisplay(paramId) {
+    const container = document.getElementById('param-info-container');
+    const titleEl = document.getElementById('param-info-title');
+    const descEl = document.getElementById('param-info-desc');
+    
+    const info = PARAM_DESCRIPTIONS[paramId];
+    
+    if (info) {
+        titleEl.innerText = info.title;
+        descEl.innerText = info.description;
+        
+        // Mostra il contenitore
+        container.classList.remove('hidden');
+        
+        // Resetta il timeout precedente se esiste
+        if (paramInfoTimeout) clearTimeout(paramInfoTimeout);
+        
+        // Nascondi di nuovo dopo qualche secondo di inattività (opzionale ma carino)
+        paramInfoTimeout = setTimeout(() => {
+            container.classList.add('hidden');
+        }, 1000000); // Nascondi dopo 5 secondi
+    }
+}
+
+const btnRestart = document.getElementById('btn-restart');
+if (btnRestart) btnRestart.addEventListener('click', () => location.reload());
+
+// --- TOGGLE GUI (DEBUG) ---
+document.addEventListener('keydown', (e) => {
+    // Premi 'H' per nascondere/mostrare gli slider
+    if (e.key.toLowerCase() === 'h') {
+        const sceneEdit = document.getElementById('scene-edit');
+        if (sceneEdit) {
+            sceneEdit.classList.toggle('gui-hidden');
+            console.log("GUI Visibility:", !sceneEdit.classList.contains('gui-hidden'));
         }
     }
-}
-
-// Funzione che gestisce SOLO i grafici 3D
-function initImpact3D() {
-    // Recupera i parametri attuali
-    const params = {
-        opacita: parseFloat(document.getElementById('param-opacita')?.value || 0),
-        deumanizzazione: parseFloat(document.getElementById('param-deumanizzazione')?.value || 0),
-        polarizzazione: parseFloat(document.getElementById('param-polarizzazione')?.value || 0),
-        assertivita: parseFloat(document.getElementById('param-assertivita')?.value || 0),
-        moralizzazione: parseFloat(document.getElementById('param-moralizzazione')?.value || 0),
-        emotivo: parseFloat(document.getElementById('param-emotivo')?.value || 0)
-    };
-
-    console.log("Initializing Impact 3D Graphics...", params);
-    
-    // Lancia il manager 3D
-    if(impactManagerV2) {
-        impactManagerV2.init(params);
-    }
-}
-
-// Aggiungi il listener per il tasto restart V2
-const btnRestartV2 = document.getElementById('btn-restart-v2');
-if (btnRestartV2) btnRestartV2.addEventListener('click', () => location.reload());
-
-// --- FINE MAIN.JS (Il resto delle helper functions e toggle GUI restano uguali) ---
+});
