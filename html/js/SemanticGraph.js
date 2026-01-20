@@ -5,8 +5,10 @@ export class SemanticGraph {
         this.containerSelector = `#${containerId}`;
         this.container = d3.select(this.containerSelector);
         
+        // Controllo esistenza container
         if (this.container.empty()) {
-            console.error("SemanticGraph: Container not found!");
+            // Non blocchiamo tutto se manca, ma avvisiamo
+            console.warn(`SemanticGraph: Container #${containerId} not found.`);
             return;
         }
 
@@ -28,7 +30,7 @@ export class SemanticGraph {
         this.idleSpeed = 0.5; 
         this.time = 0;
 
-        // Distribuzione casuale
+        // Distribuzione casuale parametri sui macro-assi
         this.macroOwnership = this.macroParametri.map(() => {
             let targets = [];
             while(targets.length < 17) {
@@ -57,15 +59,16 @@ export class SemanticGraph {
             this.animateIdle(); 
         });
 
-        // Listener Resize
+        // Listener Resize automatico
         window.addEventListener('resize', () => {
-            this.container.selectAll("svg").remove();
-            this.initSVG();
+            this.resize();
         });
     }
 
     initSVG() {
         const node = this.container.node();
+        if (!node) return;
+        
         const w = node.clientWidth;
         const h = node.clientHeight;
 
@@ -108,7 +111,7 @@ export class SemanticGraph {
     drawStaticElements() {
         const self = this;
 
-        // Macro
+        // Macro Text
         const macroGroups = this.mainGroup.selectAll(".macro-group")
             .data(this.macroParametri).enter().append("g").attr("class", "macro-group");
 
@@ -129,7 +132,7 @@ export class SemanticGraph {
                     .text(d);
             });
 
-        // Params
+        // Params Text & Lines
         const paramGroups = this.mainGroup.selectAll(".param-group")
             .data(this.dataset).enter().append("g").attr("class", "param-group");
 
@@ -210,9 +213,7 @@ export class SemanticGraph {
         const lineAmplitude = 0.5 + (emotivo * 1.5);
 
         // --- LERP FACTOR (Velocità Ease) ---
-        // 0.05 = Molto lento e pesante
-        // 0.1  = Bilanciato (consigliato)
-        // 0.2  = Reattivo
+        // 0.1  = Bilanciato (fluido e reattivo)
         const lerpFactor = 0.1;
 
         // --- AGGIORNAMENTO LINEE (Istogrammi) ---
@@ -249,5 +250,14 @@ export class SemanticGraph {
                 return bundle([[m.x, m.y], [mx, my], [t.x - t.nx * 5, t.y - t.ny * 5]]);
             })
             .style("stroke-opacity", 0.4 + Math.sin(this.time * 1.5) * 0.2);
+    }
+
+    // --- METODO AGGIUNTO PER EVITARE CRASH ---
+    resize() {
+        if(!this.container || this.container.empty()) return;
+        this.container.selectAll("svg").remove();
+        this.initSVG();
+        // Forza un aggiornamento visuale immediato
+        this.updateVisuals();
     }
 }
