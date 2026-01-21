@@ -305,38 +305,41 @@ document.addEventListener('keydown', (e) => {
     }
 }); 
 
+// Funzione unificata per la conferma
 function handleConfirmation() {
-    console.log("Handle Confirmation in scene:", sceneMgr.currentScene); // Debug
-
+    
     // 1. INTRO -> ISTRUZIONI
     if (sceneMgr.currentScene === 'intro') {
         sceneMgr.goTo('instructions');
     }
     
-    // 2. CAROSELLO -> EDIT
+    // 2. CAROSELLO -> PRE-EDIT (Nuovo Passaggio!)
     else if (sceneMgr.currentScene === 'carousel') {
+         // Salviamo i dati della card scelta (titolo/corpo) nel DOM della scena edit,
+         // così sono pronti quando ci arriveremo, ma prima mostriamo le istruzioni.
          const selectedData = CARDS_DATA[currentCardIndex];
-         
          document.getElementById('edit-headline').innerText = selectedData.headline;
          document.getElementById('edit-body').innerText = selectedData.body;
          
-         sceneMgr.goTo('edit'); 
-         
-         setTimeout(() => { 
-             if(semanticGraph && typeof semanticGraph.resize === 'function') {
-                 semanticGraph.resize(); 
-             }
-             // updateLiveText(); // Scommenta se vuoi che parta subito
-        }, 600);
+         // VAI ALLA NUOVA SCHERMATA ISTRUZIONI
+         sceneMgr.goTo('pre-edit'); 
+    }
+
+    // 3. PRE-EDIT -> EDIT (Nuovo Passaggio!)
+    else if (sceneMgr.currentScene === 'pre-edit') {
+        sceneMgr.goTo('edit'); 
+        
+        // Resize del grafico solo quando arriviamo effettivamente all'edit
+        setTimeout(() => { if(semanticGraph) semanticGraph.resize(); }, 200);
     }
     
-    // 3. EDIT -> IMPACT V2
+    // 4. EDIT -> PROCESSING
     else if (sceneMgr.currentScene === 'edit') {
-        finalizeExperience();
+        startProcessing();
     }
     
-    // 4. IMPACT V2 -> RESTART
-    else if (sceneMgr.currentScene === 'impact-v2' || sceneMgr.currentScene === 'impact') {
+    // 5. IMPACT -> RELOAD
+    else if (sceneMgr.currentScene === 'impact') {
         location.reload(); 
     }
 }

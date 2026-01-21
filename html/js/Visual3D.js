@@ -100,7 +100,7 @@ loadModel() {
 
             const scale = 1.4; 
             this.model.scale.set(scale, scale, scale);
-            this.model.position.y = -2; 
+            this.model.position.y = -2.3; 
 
             this.totemGroup.add(this.model);
             console.log("🗿 Totem caricato: Metallo + Full Edges");

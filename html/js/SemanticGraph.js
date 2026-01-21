@@ -110,52 +110,99 @@ export class SemanticGraph {
 
     drawStaticElements() {
         const self = this;
+        
+        // 1. Definiamo la rotazione globale (150 gradi) in radianti
+        // Hardcodato per sicurezza, così funziona indipendentemente da variabili esterne
+        const ROTATION_DEGREES = 150; 
+        const globalRad = ROTATION_DEGREES * (Math.PI / 180);
+        
+        // FUNZIONE CHE CALCOLA LA VERA POSIZIONE VISIVA
+        // Applica la rotazione 2D al punto (x,y) per vedere dove finisce sullo schermo
+        const isVisuallyLeft = (x, y) => {
+            // Formula rotazione: x' = x*cos(t) - y*sin(t)
+            const visualX = x * Math.cos(globalRad) - y * Math.sin(globalRad);
+            // Se la X finale è negativa (con un po' di margine), siamo a sinistra
+            return visualX < -0.1; 
+        };
 
-        // Macro Text
+        // --- A. MACRO TEXT (POLARIZZAZIONE, ecc.) ---
         const macroGroups = this.mainGroup.selectAll(".macro-group")
             .data(this.macroParametri).enter().append("g").attr("class", "macro-group");
 
         macroGroups.append("text")
             .each(function(d, i) {
                 const v = self.hexVertices[i];
-                const isLeft = Math.cos(v.angle) < -0.1;
-                let rot = v.angle * 180 / Math.PI;
+                
+                // Usiamo il check geometrico
+                const isLeft = isVisuallyLeft(v.x, v.y);
+                
+                let rot = v.angle * 180 / Math.PI; // Rotazione locale base
+                
+                // Se visivamente a sinistra, ruota di 180° per leggere dritto
                 if (isLeft) rot += 180;
                 
+                // Calcolo posizione testo (spinto un po' fuori: 65px)
+                const tx = v.x + Math.cos(v.angle) * 65;
+                const ty = v.y + Math.sin(v.angle) * 65;
+
                 d3.select(this)
-                    .attr("x", v.x + Math.cos(v.angle) * 50)
-                    .attr("y", v.y + Math.sin(v.angle) * 50)
+                    .attr("x", tx)
+                    .attr("y", ty)
                     .attr("class", "macro-text")
-                    .attr("text-anchor", isLeft ? "end" : "start")
+                    // Se ruotiamo di 180 (isLeft), ancoriamo alla FINE (end)
+                    // così il testo si estende verso l'interno e non si sovrappone
+                    .attr("text-anchor", isLeft ? "end" : "start") 
                     .attr("alignment-baseline", "middle")
-                    .attr("transform", `rotate(${rot}, ${v.x + Math.cos(v.angle) * 50}, ${v.y + Math.sin(v.angle) * 50})`)
+                    .attr("transform", `rotate(${rot}, ${tx}, ${ty})`)
                     .text(d);
             });
 
-        // Params Text & Lines
+        // --- B. PARAM TEXT (Metafora, ecc.) ---
         const paramGroups = this.mainGroup.selectAll(".param-group")
             .data(this.dataset).enter().append("g").attr("class", "param-group");
 
         paramGroups.append("text")
             .attr("class", "param-text")
-            .attr("x", d => d.x).attr("y", d => d.y)
-            .attr("text-anchor", d => d.nx < -0.1 ? "end" : "start")
-            .attr("alignment-baseline", "middle")
-            .attr("transform", d => {
-                let rot = d.angle * 180 / Math.PI;
-                if (d.nx < -0.1) rot += 180;
-                return `rotate(${rot}, ${d.x}, ${d.y})`;
-            })
-            .text(d => d.nome);
+            .each(function(d) {
+                // Check geometrico sulle coordinate del parametro
+                const isLeft = isVisuallyLeft(d.x, d.y);
+                d.isVisualLeft = isLeft; // Salviamo per le linee
 
+                // Calcolo rotazione locale
+                let rot = Math.atan2(d.ny, d.nx) * (180 / Math.PI);
+                
+                // Fix rotazione se a sinistra
+                if (isLeft) rot += 180;
+
+                d3.select(this)
+                    .attr("x", d.x).attr("y", d.y)
+                    // Anchor dinamico: A sinistra 'end', a destra 'start'
+                    .attr("text-anchor", isLeft ? "end" : "start")
+                    .attr("alignment-baseline", "middle")
+                    .attr("transform", `rotate(${rot}, ${d.x}, ${d.y})`)
+                    .text(d.nome);
+            });
+
+        // --- C. LINEE DEI VALORI ---
         this.valueLines = paramGroups.append("line")
             .attr("class", "value-line")
             .each(function(d) {
                 const textNode = d3.select(this.parentNode).select("text").node();
                 const tw = textNode.getBBox().width;
-                d.lx = d.x + d.nx * (tw + 12);
-                d.ly = d.y + d.ny * (tw + 12);
-                d3.select(this).attr("x1", d.lx).attr("y1", d.ly).attr("x2", d.lx).attr("y2", d.ly);
+                const gap = 12; // Spazio tra testo e linea
+
+                // La linea deve sempre partire DOPO il testo, andando verso l'esterno.
+                // Poiché abbiamo gestito l'anchor (start/end) e la rotazione (0/180),
+                // la logica della distanza è identica per entrambi i lati:
+                // Dobbiamo saltare la larghezza del testo + il gap.
+                const startDist = tw + gap;
+
+                d.lx = d.x + d.nx * startDist;
+                d.ly = d.y + d.ny * startDist;
+                
+                d3.select(this)
+                    .attr("x1", d.lx).attr("y1", d.ly)
+                    .attr("x2", d.lx).attr("y2", d.ly);
             });
     }
 

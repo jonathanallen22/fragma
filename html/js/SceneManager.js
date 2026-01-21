@@ -6,6 +6,11 @@ export class SceneManager {
             intro: document.getElementById('scene-intro'),
             instructions: document.getElementById('scene-instructions'),
             carousel: document.getElementById('scene-carousel'),
+            
+            // CORREZIONE QUI: Usa le virgolette per il nome con il trattino 'pre-edit'
+            // così corrisponde alla chiamata sceneMgr.goTo('pre-edit') fatta nel main.js
+            'pre-edit': document.getElementById('scene-pre-edit'),
+            
             edit: document.getElementById('scene-edit'),
             processing: document.getElementById('scene-processing'),
             impact: document.getElementById('scene-impact')
@@ -32,13 +37,18 @@ export class SceneManager {
     }
 
     goTo(sceneName) {
-        if (!this.scenes[sceneName]) return;
+        // Controllo di sicurezza: se la scena non esiste, fermati e avvisa in console
+        if (!this.scenes[sceneName]) {
+            console.warn(`⚠️ SceneManager: Scena '${sceneName}' non trovata! Controlla i nomi.`);
+            return;
+        }
+
         console.log(`🎬 MOVING TO: ${sceneName}`);
 
         const oldScene = this.scenes[this.currentScene];
         const newScene = this.scenes[sceneName];
 
-        // HEADER: Appare dalla scena 2 e resta fisso
+        // HEADER: Appare dalla scena instructions in poi (o comunque diverso da intro)
         if (sceneName !== 'intro') {
             this.globalHeader.classList.remove('hidden');
             gsap.to(this.globalHeader, { autoAlpha: 1, duration: 0.5 });
@@ -90,7 +100,7 @@ export class SceneManager {
         gsap.set(".instruct-line", { autoAlpha: 0, y: 50 });
         const tl = gsap.timeline({
             delay: 0.5,
-            onComplete: () => setTimeout(() => this.goTo('carousel'), 600) // Tempo lettura aumentato
+            onComplete: () => setTimeout(() => this.goTo('carousel'), 2000) // Aumentato a 2s per leggere meglio
         });
         // Testi appaiono e RESTANO
         tl.to(".line-1", { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" })

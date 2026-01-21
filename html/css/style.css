@@ -69,10 +69,13 @@ body {
 .mono { font-size: 2rem; color: rgba(255,255,255,0.6); font-weight: 300; letter-spacing: 0.4rem; text-transform: uppercase; margin: 0; }
 
 .footer-intro { 
-    position: absolute; bottom: 20vh; width: 100%; text-align: center; z-index: 50; 
+    position: absolute; bottom: 19vh; width: 100%; text-align: center; z-index: 50; font-size: 1.8rem; letter-spacing: 0.2rem;
 }
+
+
+
 .scan-effect {
-    font-family: var(--font-mono); font-size: 1.5rem; letter-spacing: 0.4rem; font-weight: bold;
+    font-family: var(--font-mono); font-weight: bold;
     color: var(--accent-color); text-transform: uppercase; cursor: pointer; pointer-events: all;
     animation: blink 2s infinite;
 }
@@ -114,7 +117,7 @@ body {
 .newspaper-body { font-family: var(--font-hoves); font-size: 1.3rem; line-height: 1.5; color: #ccc; text-align: justify; margin: 0; }
 
 .carousel-footer { position: absolute; bottom: 4%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-.knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.2rem; letter-spacing: 0.2rem; }
+.knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.8rem; letter-spacing: 0.2rem; }
 
 /* =========================================
    SCENA 6: EDIT MODE (LAYOUT FIX DEFINITIVO)
@@ -131,7 +134,7 @@ body {
 /* --- PARTE ALTA: TESTO (Non si schiaccia) --- */
 .edit-text-wrapper { 
     position: absolute; /* Fisso in alto */
-    top: 10vh;
+    top: 58vh;
     left: 50%;
     transform: translateX(-50%);
     width: 80%; 
@@ -147,7 +150,7 @@ body {
     position: absolute; /* Svincolato dal flusso */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -45%); /* Centrato (leggermente su per bilanciare i footer) */
+    transform: translate(-50%, -75%); /* Centrato (leggermente su per bilanciare i footer) */
     width: 90vw;  /* Larghezza fissa */
     height: 70vh; /* Altezza fissa */
     z-index: 1;   /* Livello base */
@@ -156,7 +159,10 @@ body {
     justify-content: center; 
     align-items: center;
 }
-svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno */
+#graph-container svg {
+    transform: rotate(150deg);
+}
+svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno */
 
 /* Stili Grafo Luminosi */
 .param-text { fill: #aaa; font-family: var(--font-hoves); font-size: 1.1rem; font-weight: regular;}
@@ -187,11 +193,12 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 #pedina{
     scale: 0.4;
     position: absolute;
-    top: -530% ;
+    bottom: 0vh;
 }
 
 
-#mini-totem-container { width: 120px; height: 140px; position: relative; z-index: 101; filter: drop-shadow(0 0 20px rgba(255, 72, 36, 0.3)); }
+#mini-totem-container { width: 120px; height: 140px; position: absolute; z-index: 101; filter: drop-shadow(0 0 20px rgba(255, 72, 36, 0.3));
+                     }
 
 /*spiegazione parametri modificati stile
 
@@ -212,6 +219,7 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
     pointer-events: none; /* IMPORTANTE: Così se ci finisce il mouse sopra, puoi cliccare quello che c'è sotto */
     transition: opacity 0.3s ease;
     padding-bottom: 1%;
+    display: none;
 }
 
 /* Quando è nascosto */
@@ -693,3 +701,99 @@ svg { width: 95%; height: 95%; overflow: visible; } /* Un po' di margine interno
 
 /* Nascondi vecchia scena impact */
 #scene-impact { display: none !important; }
+
+
+/* =========================================
+   SCENA PRE-EDIT (LAYOUT 50/50)
+   ========================================= */
+#scene-pre-edit {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background: var(--bg-color);
+    overflow: hidden; /* Niente scroll */
+}
+
+/* --- PARTE ALTA (VISUAL) --- */
+.pre-edit-visual {
+    height: 50vh; /* Esattamente metà schermo */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border-bottom: 1px solid #333;*/
+}
+
+.placeholder-rect {
+    width: 60%;  /* Larghezza del box immagine */
+    height: 80%; /* Altezza relativa al contenitore superiore */
+    border: 1px dashed #555;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.placeholder-rect span {
+    font-family: var(--font-mono);
+    color: #666;
+    font-size: 0.8rem;
+    letter-spacing: 0.1rem;
+}
+
+/* --- PARTE BASSA (CONTENT) --- */
+.pre-edit-content {
+    height: 50vh; 
+    width: 100%;
+    
+    /* GRIGLIA CHE GESTISCE L'ALLINEAMENTO (Struttura) */
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 Colonne identiche */
+    grid-template-rows: repeat(3, 0.2fr); /* 3 Righe di altezza uguale */
+    grid-auto-flow: column; /* Riempie prima colonna 1 (1,2,3) poi colonna 2 (4,5,6) */
+    
+    /* I TUOI SPAZI ORIGINALI */
+    padding: 5vh 8vw 8vh 8vw; 
+    box-sizing: border-box;
+    gap: 1vh 6vw; /* Gap solo orizzontale tra colonne, il verticale è gestito dalle righe */
+}
+
+/* BOX SINGOLO PARAMETRO */
+.param-row {
+    /* Manteniamo il tuo padding sinistro e flex */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra verticalmente nello spazio della griglia */
+}
+
+.param-row h4 {
+    font-family: var(--font-hoves);
+    /* TUE DIMENSIONI RIPRISTINATE */
+    font-size: 2rem; 
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    
+}
+
+.param-row p {
+    font-family: var(--font-hoves);
+    color: #ccc;
+    /* TUE DIMENSIONI RIPRISTINATE */
+    font-size: 1.7rem; 
+    line-height: 1.4;
+    margin: 0;
+    /* TUA LARGHEZZA RIPRISTINATA */
+    max-width: 96%; 
+    
+}
+
+/* Footer Action */
+.pre-edit-footer {
+    position: absolute;
+    bottom: 3vh;
+    width: 100%;
+    text-align: center;
+    pointer-events: none; /* Per cliccare attraverso se serve */
+}
