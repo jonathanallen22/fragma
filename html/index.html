@@ -36,10 +36,10 @@
             <div class="mono">Beta Experience</div>
         </div>
         <footer class="footer-intro">
-            <p class="scan-effect">PRESS TO START</p>
+            <p class="scan-effect">PREMI PER INIZIARE</p>
         </footer>
     </section>
-
+ 
     <section id="scene-instructions" class="scene hidden">
         <div class="centered-text">
             <h1 class="instruct-line line-1">READ AND CHOOSE</h1>
@@ -49,26 +49,24 @@
     </section>
 
     <section id="scene-carousel" class="scene hidden">
-        <div class="carousel-title-box"><h2>SELECT A PARAGRAPH TO MANIPULATE</h2></div>
+        <div class="carousel-title-box"><h2>SCEGLI UN TESTO DA MANIPOLARE</h2></div>
         <div class="carousel-viewport"><div id="carousel-track"></div></div>
         <footer class="carousel-footer">
             <div class="knob-icon">
-                <svg width="70" height="40" viewBox="0 0 100 60">
-                    <ellipse cx="50" cy="15" rx="40" ry="12" fill="none" stroke="#FF4824" stroke-width="2"/>
-                    <path d="M10 15 v20 a40 12 0 0 0 80 0 v-20" fill="none" stroke="#FF4824" stroke-width="2"/>
-                    <line x1="50" y1="27" x2="50" y2="55" stroke="#FF4824" stroke-width="2"/>
-                </svg>
+                <video class="knob-video" autoplay loop muted playsinline>
+                <source src="./assets/video/knob-loop.mp4" type="video/mp4">
+                </video>
             </div>
-            <p class="knob-instruction">MOVE THE KNOB AND CHOOSE</p>
+            <p class="knob-instruction">RUOTA LA MANOPOLA E CLICCA PER SCEGLIERE </p>
             
         </footer>
     </section>
     <section id="scene-pre-edit" class="scene hidden">
-        
+        <p class="pre-edit-title-gif">INTERAZIONE</p>
+        <p class="pre-edit-body-gif">Muovi le pedine per cambiare i valori dei parametri linguistici da zero a cinque e leggi in tempo reale come cambia la notizia che hai scelto di manipolare  </p>
+
         <div class="pre-edit-visual">
-            <div class="placeholder-rect">
-                <span>[ AREA INFOGRAFICA ]<br>1920x1080px PNG</span>
-            </div>
+            <img src="./assets/video/instructions.gif" class="instruct-gif" alt="Instructions">
         </div>
 
        <div class="pre-edit-content">
@@ -108,7 +106,7 @@
         </div>
 
         <div class="pre-edit-footer">
-            <p class="blink-warning">PRESS SPACE TO INITIALIZE EDITING</p>
+            <p class="blink-warning">PREMI PER INIZIARE A MODIFICARE</p>
         </div>
 
     </section>
@@ -254,9 +252,8 @@
         </div>
 
         <div class="v2-footer">
-            <div class="blink-warning">PRESS TO PROCEED</div>
-            <div class="scan-effect-btn" id="btn-restart-v2">SYSTEM REBOOT</div>
-        </div>
+            <div class="blink-warning">PRESS TO RESTART EXPERIENCE</div>
+            </div>
     </div> <script type="module" src="js/main.js"></script>
 </body>
 </html>

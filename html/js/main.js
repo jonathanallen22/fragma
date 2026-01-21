@@ -7,11 +7,9 @@ import { CARDS_DATA } from './DataManager.js';
 import { SemanticGraph } from './SemanticGraph.js';
 import { ImpactVisualizer } from './ImpactVisualizer.js'; 
 import { SerialManager } from './SerialManager.js';
-// --- NUOVO IMPORT ---
 import { LLMClient } from './LLMClient.js';
-import { PARAM_DESCRIPTIONS } from './DataManager.js'; // Assicurati del percorso
+import { PARAM_DESCRIPTIONS } from './DataManager.js';
 import { Impact3DManager } from './Impact3DManager.js';
-
 
 console.log("🚀 Fragma System Init...");
 
@@ -25,9 +23,9 @@ const impactManagerV2 = new Impact3DManager();
 const impactHero = document.getElementById('impact-hero');
 const impactHeroClose = document.getElementById('impact-hero-close');
 
-// Client per la generazione AI (Punta al backend Python)
+// Client AI
 const llmClient = new LLMClient("http://localhost:5001/generate");
-let currentGeneratedBody = ""; // Variabile per accumulare il testo in arrivo
+let currentGeneratedBody = "";
 
 if (impactHeroClose && impactHero) {
     impactHeroClose.addEventListener('click', () => {
@@ -48,8 +46,6 @@ function initCarousel() {
         card.className = `card is-${data.template || 'sky'}`; 
 
         let innerHTML = '';
-        // (Logica Template identica a prima - omessa per brevità ma inclusa nel funzionamento)
-        // ... Qui inserisco i template HTML standard (Corriere, Twitter, Sky) ...
         if (data.template === 'corriere') {
             innerHTML = `
                 <div class="corriere-header">
@@ -62,37 +58,20 @@ function initCarousel() {
                     <p class="corriere-body">${data.body}</p>
                 </div>
                 <div class="corriere-footer">DATI EUROSTAT</div>`;
-        } // --- TEMPLATE TWITTER (Social) ---
-        else if (data.template === 'twitter') {
+        } else if (data.template === 'twitter') {
             innerHTML = `
                 <div class="twitter-header">
                     <div class="twitter-avatar"></div> 
                     <div class="twitter-user-info">
-                        
                         <div class="twitter-name-row">
-                            <span class="twitter-name">${data.author}</span> <svg class="twitter-verified-badge ver-white" viewBox="0 0 24 24">
-                                <g>
-                                    <path class="badge-bg" d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.518-1.59.02-3.368-1.255-4.42-1.34-1.08-3.16-1.08-4.353.266-1.09-1.26-2.98-1.53-4.335-.4-1.354.96-1.89 2.8-1.12 4.45C7.88 9.49 6.55 10.5 6.55 12.5c0 1.95 1.37 3 2.74 3.75-.75 1.6-1.25 3.1 1.15 4.5 1.25 1.15 3.15 1.25 4.35-.4 1.2 1.35 3.05 1.35 4.35.4 1.27-1.05 1.77-2.83 1.25-4.42 1.27-.65 2.15-2.02 2.15-3.6z"></path>
-                                    <path class="badge-check" d="M10.11 17.55L6.7 13.5l1.55-1.34 2.1 2.24 6.13-6.9 1.64 1.25-7.75 8.8z"></path>
-                                </g>
-                            </svg>
+                            <span class="twitter-name">${data.author}</span> <svg class="twitter-verified-badge ver-white" viewBox="0 0 24 24"><g><path class="badge-bg" d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.518-1.59.02-3.368-1.255-4.42-1.34-1.08-3.16-1.08-4.353.266-1.09-1.26-2.98-1.53-4.335-.4-1.354.96-1.89 2.8-1.12 4.45C7.88 9.49 6.55 10.5 6.55 12.5c0 1.95 1.37 3 2.74 3.75-.75 1.6-1.25 3.1 1.15 4.5 1.25 1.15 3.15 1.25 4.35-.4 1.2 1.35 3.05 1.35 4.35.4 1.27-1.05 1.77-2.83 1.25-4.42 1.27-.65 2.15-2.02 2.15-3.6z"></path><path class="badge-check" d="M10.11 17.55L6.7 13.5l1.55-1.34 2.1 2.24 6.13-6.9 1.64 1.25-7.75 8.8z"></path></g></svg>
                         </div>
-                        
                         <span class="twitter-handle">@Syntax_F1</span> </div>
                 </div>
-
-                <div class="twitter-content">
-                    <p class="twitter-body">${data.headline}<br><br>${data.body}</p>
-                </div>
-                
+                <div class="twitter-content"><p class="twitter-body">${data.headline}<br><br>${data.body}</p></div>
                 <div class="twitter-footer">
                     <svg viewBox="0 0 24 24" class="tw-icon"><g><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.25c-4.42 0-8.004-3.58-8.004-8z"></path></g></svg>
-                    <svg viewBox="0 0 24 24" class="tw-icon"><g><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path></g></svg>
-                    <svg viewBox="0 0 24 24" class="tw-icon"><g><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91z"></path></g></svg>
-                    <svg viewBox="0 0 24 24" class="tw-icon"><path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5zM6.5 4c-.276 0-.5.22-.5.5v14.56l6-4.29 6 4.29V4.5c0-.28-.224-.5-.5-.5h-11z"></path></svg>
-                    <svg viewBox="0 0 24 24" class="tw-icon"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 15l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.12 21 3 19.88 3 18.5V15h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 15h2z"></path></svg>
-                </div>
-            `;
+                </div>`;
         } else {
             innerHTML = `
                 <div class="sky-header">
@@ -106,15 +85,12 @@ function initCarousel() {
         card.innerHTML = innerHTML;
         carouselTrack.appendChild(card);
     });
-
     requestAnimationFrame(() => updateCarousel());
 }
 
 function updateCarousel() {
     const cards = document.querySelectorAll('.card');
     if(cards.length === 0) return;
-    
-    // Calcolo posizioni per centrare la card attiva
     const firstCard = cards[0];
     const cardWidth = firstCard.offsetWidth; 
     const style = window.getComputedStyle(carouselTrack);
@@ -139,21 +115,15 @@ setTimeout(initCarousel, 100);
 window.addEventListener('resize', updateCarousel);
 
 
-// --- LOGICA LLM & LIVE UPDATE ---
+// --- LIVE TEXT & UPDATE ---
 
-/**
- * Questa funzione viene chiamata ogni volta che un parametro cambia (Arduino o Slider).
- * Prende i valori, chiama il backend Python e aggiorna il testo a schermo in streaming.
- */
 function updateLiveText() {
-    // Sicurezza: eseguiamo solo se siamo nella scena di modifica
     if (sceneMgr.currentScene !== 'edit') return;
 
     const originalData = CARDS_DATA[currentCardIndex];
     const bodyEl = document.getElementById('edit-body');
     const scrollContainer = document.querySelector('.scrolling-body');
     
-    // Recupero i valori correnti
     const currentParams = {
         opacita: parseFloat(document.getElementById('param-opacita').value || 0),
         deumanizzazione: parseFloat(document.getElementById('param-deumanizzazione').value || 0),
@@ -163,85 +133,104 @@ function updateLiveText() {
         emotivo: parseFloat(document.getElementById('param-emotivo').value || 0)
     };
     
-    // 1. IMPOSTIAMO LA SCRITTA DI ATTESA
     bodyEl.innerText = "Processing..."; 
     bodyEl.style.opacity = "0.8"; 
-
-    // 2. FLAG PER IL PRIMO DATO
     let isFirstChunk = true;
 
-    // Avvia lo streaming
     llmClient.streamText(
-        originalData.body, 
-        currentParams,     
+        originalData.body, currentParams,     
         (chunk) => {
-            // [ON CHUNK]: Arrivano i dati veri
-
-            // SE È IL PRIMO PEZZO -> CANCELLA LA SCRITTA "PROCESSING"
-            if (isFirstChunk) {
-                bodyEl.innerText = "";      // Pulisci il DOM solo ora!
-                bodyEl.style.opacity = "1"; // Rimetti opacità piena
-                isFirstChunk = false;       // Flag spento
-            }
-            
+            if (isFirstChunk) { bodyEl.innerText = ""; bodyEl.style.opacity = "1"; isFirstChunk = false; }
             currentGeneratedBody += chunk;
             bodyEl.innerText = currentGeneratedBody; 
-            
             if(scrollContainer) scrollContainer.scrollTop = scrollContainer.scrollHeight;
         },
-        () => {
-            // [ON START]: Inizio connessione
-            currentGeneratedBody = ""; // Resetta SOLO la variabile stringa
-            
-            // --- MODIFICA FONDAMENTALE ---
-            // HO RIMOSSO: bodyEl.innerText = ""; 
-            // Perché se lo lasci qui, cancelli la scritta "Processing" istantaneamente!
-        },
-        (err) => {
-            // [ON ERROR]
-            console.error(err);
-            bodyEl.innerText = "// ERRORE CONNESSIONE NEURAL //";
-            bodyEl.style.opacity = "1";
+        () => { currentGeneratedBody = ""; },
+        (err) => { console.error(err); bodyEl.innerText = "// ERRORE CONNESSIONE NEURAL //"; }
+    ).then(() => { bodyEl.style.opacity = 1; });
+}
+
+// --- GESTIONE NAVIGAZIONE "INDIETRO" ---
+
+function goBack() {
+    console.log("🔙 Back from:", sceneMgr.currentScene);
+    
+    // 1. CAROSELLO -> Indietro nelle card
+    if (sceneMgr.currentScene === 'carousel') {
+        if (currentCardIndex > 0) {
+            currentCardIndex--; 
+            updateCarousel();
         }
-    ).then(() => {
-        // [ON COMPLETE]
-        bodyEl.style.opacity = 1;
-    });
+    }
+    // 2. PRE-EDIT -> Torna al CAROSELLO
+    else if (sceneMgr.currentScene === 'pre-edit') {
+        sceneMgr.goTo('carousel');
+    }
+    // 3. EDIT -> Torna a PRE-EDIT
+    else if (sceneMgr.currentScene === 'edit') {
+        sceneMgr.goTo('pre-edit');
+    }
+    // 4. IMPACT V2 (Finale) -> Torna a EDIT
+    else if (sceneMgr.currentScene === 'impact-v2') {
+        console.log("Reactivating Edit Scene...");
+
+        // A. Nascondi manualmente la V2
+        const v2 = document.getElementById('scene-impact-v2');
+        if(v2) { 
+            v2.classList.remove('active'); 
+            v2.classList.add('hidden'); 
+        }
+        
+        // B. Mostra di nuovo la scena Edit
+        const editScene = document.getElementById('scene-edit');
+        if(editScene) {
+            // 1. Gestione Classi CSS
+            editScene.classList.remove('hidden');
+            editScene.classList.add('active');
+            
+            // 2. *** FIX FONDAMENTALE *** // Forziamo GSAP a rimettere l'opacità a 1, altrimenti rimane invisibile
+            gsap.set(editScene, { autoAlpha: 1, scale: 1 });
+
+            // 3. Aggiorna Manager
+            sceneMgr.currentScene = 'edit';
+            
+            // 4. Resize grafico per sicurezza
+            setTimeout(() => { 
+                if(semanticGraph) semanticGraph.resize(); 
+            }, 100);
+        }
+    }
 }
 
 
-// --- GESTIONE INPUT (ARDUINO & SLIDERS) ---
+// --- GESTIONE INPUT (ARDUINO & TASTIERA) ---
 
 const SENSOR_MAPPING = ['opacita', 'deumanizzazione', 'polarizzazione', 'assertivita', 'moralizzazione', 'emotivo'];
 
-// 1. Logica Arduino
 const handleArduinoData = (data) => {
-    // Mapping Sensori -> Slider
+    // Sliders
     if (data.s) {
         data.s.forEach((step, i) => {
-            const percentValue = step * 20; // Converte 0-5 in 0-100
+            const percentValue = step * 20; 
             const slider = document.getElementById(`param-${SENSOR_MAPPING[i]}`);
-            
-            // Aggiorna solo se il valore cambia significativamente (evita jitter)
             if (slider && Math.abs(slider.value - percentValue) > 2) {
                 slider.value = percentValue;
-                // Dispatch input per scatenare i listener (Grafico + LLM)
                 slider.dispatchEvent(new Event('input'));
             }
         });
     }
-
-    // Mapping Encoder -> Navigazione
+    // Encoder
     if (data.e && data.e !== "NONE") {
         if (data.e === "CW") {
+            // Avanti nel carosello
             if (sceneMgr.currentScene === 'carousel' && currentCardIndex < CARDS_DATA.length - 1) {
                 currentCardIndex++; updateCarousel();
             }
         } else if (data.e === "CCW") {
-            if (sceneMgr.currentScene === 'carousel' && currentCardIndex > 0) {
-                currentCardIndex--; updateCarousel();
-            }
+            // INDIETRO: Usa la funzione centralizzata
+            goBack();
         } else if (data.e === "CLICK") {
+            // AVANTI / CONFERMA / RESET
             handleConfirmation();
         }
     }
@@ -249,88 +238,72 @@ const handleArduinoData = (data) => {
 
 const serialMgr = new SerialManager(handleArduinoData);
 
-// Funzione per aggiornare la descrizione del parametro
+// Sliders listener
+const sliders = document.querySelectorAll('.cyber-range');
+sliders.forEach(slider => slider.addEventListener('input', (e) => {
+    const paramId = e.target.id.replace('param-', '');
+    semanticGraph.updateParams({ [paramId]: parseFloat(e.target.value) });
+    updateParamInfoDisplay(paramId);
+    updateLiveText();
+}));
+
 function updateParamInfoDisplay(paramId) {
     const container = document.getElementById('param-info-container');
     const titleEl = document.getElementById('param-info-title');
     const descEl = document.getElementById('param-info-desc');
-    
-    if (!container || !titleEl || !descEl) return;
-    
     const description = PARAM_DESCRIPTIONS[paramId];
     if (description) {
-        titleEl.innerText = description.title;
-        descEl.innerText = description.description;
+        titleEl.innerText = description.title; descEl.innerText = description.description;
         container.classList.remove('hidden');
     } else {
         container.classList.add('hidden');
     }
 }
 
-// 2. Listener sugli Slider (attivati sia da mouse che da Arduino)
-const sliders = document.querySelectorAll('.cyber-range');
-sliders.forEach(slider => slider.addEventListener('input', (e) => {
-    const paramId = e.target.id.replace('param-', '');
-
-    // A. Aggiorna il Grafico D3
-    semanticGraph.updateParams({ [paramId]: parseFloat(e.target.value) });
-    
-    // B. Aggiorna la Descrizione del Parametro
-    updateParamInfoDisplay(paramId);
-    
-    // C. Aggiorna il Testo con l'AI
-    updateLiveText();
-}));
-
-
-
-
-// --- CONTROLLO FLUSSO (SCENE) ---
-
-// --- CONTROLLO FLUSSO (SCENE) ---
-
+// Tastiera Listener
 document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'c') serialMgr.connect(); 
 
-    // Navigazione tastiera Carosello
-    if (sceneMgr.currentScene === 'carousel') {
-        if (e.key === 'ArrowRight' && currentCardIndex < CARDS_DATA.length - 1) { currentCardIndex++; updateCarousel(); }
-        if (e.key === 'ArrowLeft' && currentCardIndex > 0) { currentCardIndex--; updateCarousel(); }
+    // Freccia Destra (Solo Carosello)
+    if (sceneMgr.currentScene === 'carousel' && e.key === 'ArrowRight' && currentCardIndex < CARDS_DATA.length - 1) { 
+        currentCardIndex++; updateCarousel(); 
     }
-
-    // Conferma
+    // Freccia Sinistra (INDIETRO UNIFICATO)
+    if (e.key === 'ArrowLeft') {
+        goBack();
+    }
+    // Spazio/Invio (CONFERMA)
     if (e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
         handleConfirmation();
     }
 }); 
 
-// Funzione unificata per la conferma
+
+// --- CONTROLLO FLUSSO (FORWARD) ---
+
 function handleConfirmation() {
-    
+    console.log("Handle Confirmation in scene:", sceneMgr.currentScene);
+
     // 1. INTRO -> ISTRUZIONI
     if (sceneMgr.currentScene === 'intro') {
         sceneMgr.goTo('instructions');
     }
     
-    // 2. CAROSELLO -> PRE-EDIT (Nuovo Passaggio!)
+    // 2. CAROSELLO -> PRE-EDIT
     else if (sceneMgr.currentScene === 'carousel') {
-         // Salviamo i dati della card scelta (titolo/corpo) nel DOM della scena edit,
-         // così sono pronti quando ci arriveremo, ma prima mostriamo le istruzioni.
          const selectedData = CARDS_DATA[currentCardIndex];
          document.getElementById('edit-headline').innerText = selectedData.headline;
          document.getElementById('edit-body').innerText = selectedData.body;
-         
-         // VAI ALLA NUOVA SCHERMATA ISTRUZIONI
-         sceneMgr.goTo('pre-edit'); 
+         sceneMgr.goTo('pre-edit'); // CORRETTO: Passa per pre-edit
     }
 
-    // 3. PRE-EDIT -> EDIT (Nuovo Passaggio!)
+    // 3. PRE-EDIT -> EDIT
     else if (sceneMgr.currentScene === 'pre-edit') {
         sceneMgr.goTo('edit'); 
-        
-        // Resize del grafico solo quando arriviamo effettivamente all'edit
-        setTimeout(() => { if(semanticGraph) semanticGraph.resize(); }, 200);
+        setTimeout(() => { 
+             if(semanticGraph && typeof semanticGraph.resize === 'function') semanticGraph.resize(); 
+        }, 600);
     }
     
     // 4. EDIT -> PROCESSING
@@ -338,91 +311,53 @@ function handleConfirmation() {
         startProcessing();
     }
     
-    // 5. IMPACT -> RELOAD
-    else if (sceneMgr.currentScene === 'impact') {
-        location.reload(); 
+    // 5. IMPACT V2 -> RESET CICLICO
+    else if (sceneMgr.currentScene === 'impact-v2' || sceneMgr.currentScene === 'impact') {
+        resetExperience(); 
     }
 }
 
-/**
- * Funzione Modificata:
- * 1. Prepara il testo (DOM)
- * 2. Cambia Scena (rende visibile il div)
- * 3. Aspetta 100ms
- * 4. Disegna i grafici 3D (ora che il div ha larghezza > 0)
- */
+// Processing Transition
+function startProcessing() {
+    console.log("⚙️ PROCESSING START...");
+    sceneMgr.goTo('processing');
+    setTimeout(() => { finalizeExperience(); }, 2500);
+}
+
+// Mostra Schermata Finale
 function finalizeExperience() {
-    console.log("--- FINALIZING EXPERIENCE START ---");
-    
+    console.log("--- FINALIZING EXPERIENCE ---");
     const currentHeadline = document.getElementById('edit-headline').innerText;
     const finalBody = currentGeneratedBody || document.getElementById('edit-body').innerText;
 
-    // A. Prepara l'HTML
-    prepareImpactDom(currentHeadline, finalBody);
-    
-    // B. DEBUG & FORZATURA CAMBIO SCENA
-    const nextScene = document.getElementById('scene-impact-v2');
-    
-    if (nextScene) {
-        console.log("✅ SCENE ELEMENT FOUND. Switching manually...");
-        
-        // 1. Nascondi tutte le scene
-        document.querySelectorAll('.scene').forEach(el => {
-            el.classList.remove('active');
-            el.classList.add('hidden');
-        });
-
-        // 2. Mostra quella nuova
-        nextScene.classList.remove('hidden');
-        nextScene.classList.add('active');
-        
-        // 3. Aggiorna manualmente il SceneManager
-        sceneMgr.currentScene = 'impact-v2'; 
-    } else {
-        console.error("❌ FATAL ERROR: Element #scene-impact-v2 NOT FOUND in DOM!");
-        console.log("Check your index.html file. Did you save it?");
-        return; // Stop here
-    }
-
-    // C. Inizializza il 3D con ritardo
-    setTimeout(() => {
-        initImpact3D();
-    }, 100);
-}
-
-// Funzione che gestisce SOLO l'HTML (Clonazione card e testi)
-function prepareImpactDom(title, body) {
+    // Prepara HTML
     const originalCard = document.querySelector('.card.active');
     const finalContainer = document.getElementById('final-article-content');
-    
     if (originalCard && finalContainer) {
         try {
             const clone = originalCard.cloneNode(true);
-            
-            // Pulisci stile per la versione finale
-            clone.style.transform = "none";
-            clone.style.opacity = "1";
-            clone.style.filter = "none";
-            clone.style.width = "100%";
-            clone.style.height = "auto";
-            clone.style.border = "none";
-            clone.style.background = "transparent";
-
-            // Aggiorna il testo
+            clone.style.cssText = "transform:none; opacity:1; filter:none; width:100%; height:auto; border:none; background:transparent;";
             const bodyEl = clone.querySelector('.corriere-body, .sky-body, .twitter-body');
-            if(bodyEl) bodyEl.innerText = body;
-
+            if(bodyEl) bodyEl.innerText = finalBody;
             finalContainer.innerHTML = '';
             finalContainer.appendChild(clone);
-        } catch(e) {
-            console.error("Errore clone card:", e);
-        }
+        } catch(e) { console.error(e); }
     }
+    
+    // Mostra V2 Overlay
+    const nextScene = document.getElementById('scene-impact-v2');
+    if (nextScene) {
+        document.querySelectorAll('.scene').forEach(el => { el.classList.remove('active'); el.classList.add('hidden'); });
+        nextScene.classList.remove('hidden');
+        nextScene.classList.add('active');
+        sceneMgr.currentScene = 'impact-v2'; 
+    }
+
+    setTimeout(() => { initImpact3D(); }, 100);
 }
 
-// Funzione che gestisce SOLO i grafici 3D
+// Init 3D Charts
 function initImpact3D() {
-    // Recupera i parametri attuali
     const params = {
         opacita: parseFloat(document.getElementById('param-opacita')?.value || 0),
         deumanizzazione: parseFloat(document.getElementById('param-deumanizzazione')?.value || 0),
@@ -431,17 +366,49 @@ function initImpact3D() {
         moralizzazione: parseFloat(document.getElementById('param-moralizzazione')?.value || 0),
         emotivo: parseFloat(document.getElementById('param-emotivo')?.value || 0)
     };
-
-    console.log("Initializing Impact 3D Graphics...", params);
-    
-    // Lancia il manager 3D
-    if(impactManagerV2) {
-        impactManagerV2.init(params);
-    }
+    if(impactManagerV2) impactManagerV2.init(params);
 }
 
-// Aggiungi il listener per il tasto restart V2
-const btnRestartV2 = document.getElementById('btn-restart-v2');
-if (btnRestartV2) btnRestartV2.addEventListener('click', () => location.reload());
+// --- RESET CICLICO ---
+function resetExperience() {
+    console.log("🔄 SYSTEM SOFT RESET...");
 
-// --- FINE MAIN.JS (Il resto delle helper functions e toggle GUI restano uguali) ---
+    // 1. Nascondi Impact V2
+    const v2 = document.getElementById('scene-impact-v2');
+    if(v2) { v2.classList.remove('active'); v2.classList.add('hidden'); }
+
+    // 2. Reset Variabili
+    currentCardIndex = 0;
+    currentGeneratedBody = ""; 
+
+    // 3. Reset Sliders
+    const sliders = document.querySelectorAll('.cyber-range');
+    sliders.forEach(slider => slider.value = 0);
+
+    // 4. Reset Grafico
+    if(semanticGraph) {
+        semanticGraph.updateParams({
+            opacita: 0, deumanizzazione: 0, polarizzazione: 0, assertivita: 0, moralizzazione: 0, emotivo: 0
+        });
+        if(semanticGraph.updateVisuals) semanticGraph.updateVisuals();
+    }
+
+    // 5. Reset Carosello e Testi
+    updateCarousel();
+    const editHead = document.getElementById('edit-headline');
+    const editBody = document.getElementById('edit-body');
+    if(editHead) editHead.innerText = "TITOLO NOTIZIA...";
+    if(editBody) editBody.innerText = "Corpo della notizia...";
+
+    // 6. Reset Animazione Istruzioni
+    sceneMgr.resetInstructionsState();
+
+    // 7. Vai all'Intro
+    sceneMgr.goTo('intro');
+}
+
+// Click listener sul footer finale (qualunque click su V2 triggera reset se gestito da handleConfirmation, ma aggiungiamo per sicurezza sul container)
+const v2Footer = document.querySelector('.v2-footer');
+if(v2Footer) {
+    v2Footer.addEventListener('click', () => resetExperience());
+}

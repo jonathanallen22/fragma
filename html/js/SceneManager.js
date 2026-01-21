@@ -6,11 +6,7 @@ export class SceneManager {
             intro: document.getElementById('scene-intro'),
             instructions: document.getElementById('scene-instructions'),
             carousel: document.getElementById('scene-carousel'),
-            
-            // CORREZIONE QUI: Usa le virgolette per il nome con il trattino 'pre-edit'
-            // così corrisponde alla chiamata sceneMgr.goTo('pre-edit') fatta nel main.js
             'pre-edit': document.getElementById('scene-pre-edit'),
-            
             edit: document.getElementById('scene-edit'),
             processing: document.getElementById('scene-processing'),
             impact: document.getElementById('scene-impact')
@@ -19,7 +15,7 @@ export class SceneManager {
         this.globalHeader = document.getElementById('global-header');
         this.currentScene = 'intro';
         
-        // Setup iniziale: tutto leggermente zoomato e nascosto
+        // Setup iniziale
         Object.values(this.scenes).forEach(el => {
             if(el) {
                 gsap.set(el, { autoAlpha: 0, scale: 1.1 });
@@ -28,7 +24,7 @@ export class SceneManager {
             }
         });
         
-        // Intro parte normale
+        // Intro attiva
         if(this.scenes.intro) {
             this.scenes.intro.classList.remove('hidden');
             gsap.set(this.scenes.intro, { autoAlpha: 1, scale: 1 });
@@ -37,9 +33,8 @@ export class SceneManager {
     }
 
     goTo(sceneName) {
-        // Controllo di sicurezza: se la scena non esiste, fermati e avvisa in console
         if (!this.scenes[sceneName]) {
-            console.warn(`⚠️ SceneManager: Scena '${sceneName}' non trovata! Controlla i nomi.`);
+            console.warn(`⚠️ SceneManager: Scena '${sceneName}' non trovata.`);
             return;
         }
 
@@ -48,12 +43,14 @@ export class SceneManager {
         const oldScene = this.scenes[this.currentScene];
         const newScene = this.scenes[sceneName];
 
-        // HEADER: Appare dalla scena instructions in poi (o comunque diverso da intro)
-        if (sceneName !== 'intro') {
-            this.globalHeader.classList.remove('hidden');
-            gsap.to(this.globalHeader, { autoAlpha: 1, duration: 0.5 });
-        } else {
-            gsap.to(this.globalHeader, { autoAlpha: 0, duration: 0.5 });
+        // HEADER
+        if (this.globalHeader) {
+            if (sceneName !== 'intro') {
+                this.globalHeader.classList.remove('hidden');
+                gsap.to(this.globalHeader, { autoAlpha: 1, duration: 0.5 });
+            } else {
+                gsap.to(this.globalHeader, { autoAlpha: 0, duration: 0.5 });
+            }
         }
 
         // SEQUENZA TRANSIZIONE
@@ -64,13 +61,9 @@ export class SceneManager {
             }
         });
 
-        // 1. USCITA (Zoom Out + Fade Out)
         if(oldScene) {
             tl.to(oldScene, { 
-                autoAlpha: 0, 
-                scale: 0.95, // Si allontana nello sfondo
-                duration: 0.8, 
-                ease: "power3.inOut",
+                autoAlpha: 0, scale: 0.95, duration: 0.8, ease: "power3.inOut",
                 onComplete: () => {
                     oldScene.classList.remove('active');
                     oldScene.classList.add('hidden');
@@ -78,31 +71,35 @@ export class SceneManager {
             });
         }
 
-        // 2. ENTRATA (Zoom In da 1.1 a 1 + Fade In)
         if(newScene) {
             tl.fromTo(newScene, 
-                { autoAlpha: 0, scale: 1.1 }, // Parte grande
+                { autoAlpha: 0, scale: 1.1 },
                 { 
-                    autoAlpha: 1, 
-                    scale: 1, // Arriva a dimensione normale
-                    duration: 1, 
-                    ease: "power3.out",
+                    autoAlpha: 1, scale: 1, duration: 1, ease: "power3.out",
                     onStart: () => {
                         newScene.classList.remove('hidden');
                         newScene.classList.add('active');
                     }
-                }, "-=0.5" // Sovrapposizione temporale per fluidità
+                }, "-=0.5"
             );
         }
     }
 
-    playInstructionsSequence() {
+    // --- NUOVO METODO: Resetta animazione istruzioni ---
+    resetInstructionsState() {
+        gsap.killTweensOf(".instruct-line");
+        gsap.killTweensOf(".line-1");
+        gsap.killTweensOf(".line-2");
+        gsap.killTweensOf(".line-3");
         gsap.set(".instruct-line", { autoAlpha: 0, y: 50 });
+    }
+
+    playInstructionsSequence() {
+        this.resetInstructionsState(); // Reset prima di partire
         const tl = gsap.timeline({
             delay: 0.5,
-            onComplete: () => setTimeout(() => this.goTo('carousel'), 2000) // Aumentato a 2s per leggere meglio
+            onComplete: () => setTimeout(() => this.goTo('carousel'), 2000)
         });
-        // Testi appaiono e RESTANO
         tl.to(".line-1", { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" })
           .to(".line-2", { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" }, "-=0.3")
           .to(".line-3", { autoAlpha: 1, y: 0, duration: 1, ease: "power3.out" }, "-=0.3");

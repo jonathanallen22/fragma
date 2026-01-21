@@ -214,22 +214,35 @@ export class SemanticGraph {
         this.updateVisuals();
     }
 
+   // Inserisci questa funzione dentro SemanticGraph.js al posto della vecchia updateVisuals
+
     updateVisuals() {
+        // 1. Calcolo target delle linee
         this.dataset.forEach(d => {
             let somma = 0;
             this.macroOwnership.forEach((targets, mIdx) => {
+                // Se questo parametro (d.id) è influenzato dal macro-slider (mIdx) attivo...
                 if (targets.includes(d.id) && this.livelli[mIdx] > 0) {
                     somma += (this.livelli[mIdx] * 0.04 * this.MOLTIPLICATORE * 10) + d.jitter;
                 }
             });
-            // Settiamo il target, non la lunghezza corrente
+            // Settiamo il target
             d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 220);
         });
 
-        // Gestione macro text e ragnatela (logica discreta)
+        // 2. Gestione MACRO TEXT (Le scritte grandi tipo "ASSERTIVITÀ")
         this.mainGroup.selectAll(".macro-text").transition().duration(300)
-            .style("fill", (d, i) => this.livelli[i] > 10 ? "#ffffffb3" : "#444");
+            .style("fill", (d, i) => this.livelli[i] > 5 ? "#ffffff" : "#444");
 
+        // --- 3. NUOVO: Gestione PARAM TEXT (Le scritte piccole tipo "Metafora") ---
+        this.mainGroup.selectAll(".param-text").transition().duration(400)
+            .style("fill", d => {
+                // Se la linea si sta allungando (targetLen > 2), accendiamo il testo.
+                // Altrimenti resta spento (#333).
+                return d.targetLen > 2 ? "#e0e0e0" : "#333";
+            });
+
+        // 4. Gestione Ragnatela (Connessioni interne)
         const activeLinks = [];
         this.macroOwnership.forEach((targets, mIdx) => {
             const liv = this.livelli[mIdx];
@@ -242,7 +255,6 @@ export class SemanticGraph {
         });
 
         const links = this.mainGroup.selectAll(".connection").data(activeLinks, d => d.id);
-        const bundle = d3.line().curve(d3.curveBundle.beta(0.85));
 
         links.enter().append("path")
             .attr("class", "connection")

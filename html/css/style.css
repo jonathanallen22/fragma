@@ -116,7 +116,7 @@ body {
 .newspaper-headline { font-family: 'Times New Roman', serif; font-size: 3.5rem; line-height: 1.1; margin-bottom: 2rem; margin-top: 0; }
 .newspaper-body { font-family: var(--font-hoves); font-size: 1.3rem; line-height: 1.5; color: #ccc; text-align: justify; margin: 0; }
 
-.carousel-footer { position: absolute; bottom: 4%; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.carousel-footer { position: absolute; bottom: 4%; width: 100%; display: flex; flex-direction: column; align-items: center; }
 .knob-instruction { font-family: var(--font-mono); color: var(--accent-color); font-size: 1.8rem; letter-spacing: 0.2rem; }
 
 /* =========================================
@@ -163,6 +163,21 @@ body {
     transform: rotate(150deg);
 }
 svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno */
+
+.knob-video {
+    width: 60%;  /* Dimensione che vuoi a schermo (simile ai 70px dell'SVG) */
+    height: auto; /* Mantiene le proporzioni */
+    
+    /* IL TRUCCO MAGICO: */
+    /* 'screen' o 'lighten' rendono il nero trasparente e lasciano i colori chiari */
+    
+    
+    /* Assicurati che l'utente non possa cliccarci sopra per metterlo in pausa */
+    pointer-events: none; 
+    
+    display: block; /* Per centrarlo bene */
+    margin: 0 auto; /* Se serve centrarlo orizzontalmente */
+}
 
 /* Stili Grafo Luminosi */
 .param-text { fill: #aaa; font-family: var(--font-hoves); font-size: 1.1rem; font-weight: regular;}
@@ -353,8 +368,8 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
     margin-top: auto; text-align: center; padding-top: 2rem;
 }
 .blink-warning {
-    font-family: var(--font-hoves-bold); font-size: 1.5rem; color: #fff;
-    margin-bottom: 1rem; text-transform: uppercase;
+    font-family: var(--font-hoves-bold); font-size: 1.8rem; color: #fff;
+    bottom: 1rem; text-transform: uppercase;
 }
 .scan-effect-btn {
     background: transparent; border: 1px solid #444; color: var(--accent-color);
@@ -725,21 +740,47 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
     /* border-bottom: 1px solid #333;*/
 }
 
-.placeholder-rect {
-    width: 60%;  /* Larghezza del box immagine */
-    height: 80%; /* Altezza relativa al contenitore superiore */
-    border: 1px dashed #555;
-    background: rgba(255, 255, 255, 0.05);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+/* --- CSS PER LA GIF ISTRUZIONI --- */
+.instruct-gif {
+    /* Dimensione massima: non deve mai uscire dal contenitore */
+    width: 65%;
+    height: auto;
+    margin-top: 30%;
+    
+    /* Mantiene le proporzioni originali senza schiacciare l'immagine */
+    object-fit: contain;
+    
+    /* Opzionale: se la gif ha sfondo trasparente e vuoi che si stacchi un po' */
+    /* filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1)); */
+    
+    display: block;
 }
-.placeholder-rect span {
-    font-family: var(--font-mono);
-    color: #666;
-    font-size: 0.8rem;
+
+/* Verifica che il contenitore padre abbia queste regole (dovrebbe già averle) */
+.pre-edit-visual {
+    height: 50vh;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Centra orizzontalmente */
+    align-items: center;     /* Centra verticalmente *     /* Sfondo scuro sotto la gif */
+    overflow: hidden;        /* Taglia eventuali sbordature */
+}
+.pre-edit-title-gif {
+    font-family: var(--font-hoves-medium);
+    font-size: 2rem;
+    position: absolute ;
+    padding: 15% 8vw;
     letter-spacing: 0.1rem;
+}
+.pre-edit-body-gif {
+    font-family: var(--font-hoves-medium);
+    font-size: 1.7rem;
+    position: absolute ;
+    padding: 19% 8vw;
+    max-width: 39%;
+    color: #ccc;
+    line-height: 1.4;
+    
 }
 
 /* --- PARTE BASSA (CONTENT) --- */
@@ -757,6 +798,7 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
     padding: 5vh 8vw 8vh 8vw; 
     box-sizing: border-box;
     gap: 1vh 6vw; /* Gap solo orizzontale tra colonne, il verticale è gestito dalle righe */
+    padding-right: 55px;
 }
 
 /* BOX SINGOLO PARAMETRO */
@@ -792,7 +834,7 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 /* Footer Action */
 .pre-edit-footer {
     position: absolute;
-    bottom: 3vh;
+    bottom: 4%;
     width: 100%;
     text-align: center;
     pointer-events: none; /* Per cliccare attraverso se serve */
