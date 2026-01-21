@@ -180,7 +180,13 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 }
 
 /* Stili Grafo Luminosi */
-.param-text { fill: #aaa; font-family: var(--font-hoves); font-size: 1.1rem; font-weight: regular;}
+.param-text { 
+    fill: #333; /* ERA #aaa -> LO CAMBIAMO IN SCURO DI DEFAULT */
+    font-family: var(--font-hoves); 
+    font-size: 1.1rem; 
+    font-weight: regular;
+    transition: fill 0.5s ease; /* Aggiungi questo per un effetto morbido */
+}
 .macro-text { 
     fill: #ffffffd7; font-family: var(--font-hoves-medium); font-size: 1.4rem; 
     font-weight: 800; text-transform: uppercase; letter-spacing: 0.1rem;
