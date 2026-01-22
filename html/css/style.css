@@ -643,13 +643,71 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 }
 
 /* Articolo Box */
+/* --- FIX CARD FINALE (TESTO TAGLIATO) --- */
 .final-article-box {
     border: 1px solid #333;
-    padding: 2rem;
+    padding: 2rem; /* Spazio interno */
     background: #080808;
-    margin-bottom: 2vh;
-    max-height: 38vh;
+    margin-top: 3vh;
+    max-height: 45vh; /* Un po' più alto */
     overflow-y: auto;
+    overflow-x: hidden; /* Vietato scroll orizzontale */
+}
+
+/* Forziamo la card clonata a comportarsi bene */
+.final-article-box .card {
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important; /* Rimuove rotazioni o scale residue */
+    opacity: 1 !important;
+    filter: none !important;
+    background: transparent !important;
+    border: none !important;
+    padding:0;
+    margin-top: 1vh !important;
+}
+
+/* Testo che va a capo correttamente */
+.final-article-box .corriere-headline,
+.final-article-box .sky-headline,
+.final-article-box .twitter-body {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+}
+
+/* --- FIX TITOLI (PIÙ GRANDI E VISIBILI) --- */
+.card-title {
+    font-family: 'TTHoves-Regular', sans-serif; /* Font più pulito */
+    font-size: 2.2rem; /* Molto più grande */
+    font-weight: 400;
+    color: #fff; 
+    margin-bottom: 0.2rem; 
+    text-transform: uppercase;
+    line-height: 1;
+    border: none; /* Rimosso bordo laterale se c'era */
+    padding-left: 0;
+}
+
+.card-subtitle {
+    font-family: 'Input-Mono', monospace; 
+    font-size: 0.9rem; /* Più leggibile */
+    color: #666; 
+    margin-bottom: 2rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05rem;
+    padding-left: 0;
+}
+
+/* --- ETICHETTE PER I GRAFICI (LABEL ASSI) --- */
+.chart-overlay-label {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: #666;
+    text-transform: uppercase;
+    pointer-events: none; /* Non blocca il mouse */
+    text-shadow: 0 0 2px black;
 }
 
 /* Griglia */
@@ -673,17 +731,27 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 }
 
 /* Tipografia Card */
-.card-title {
-    font-family: var(--font-hoves); font-size: 1.1rem; color: #fff; 
-    margin-bottom: 0.3rem; text-transform: uppercase;
+card-footer-text {
+    font-family: 'TTHoves-Regular', sans-serif; 
+    font-size: 1rem;          
+    color: #999;                 
+    margin-top: auto; /* Spinge in basso */
+    line-height: 1.4;            
+    border-top: none; /* Rimosso bordo superiore */
+    padding-top: 1rem;
+    max-width: 90%;
 }
-.card-subtitle {
-    font-family: var(--font-mono); font-size: 0.6rem; color: #666; 
-    margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1rem;
-}
-.card-footer-text {
-    font-family: var(--font-hoves); font-size: 0.8rem; color: #aaa; 
-    margin-top: 1rem; line-height: 1.4; border-top: 1px solid #222; padding-top: 1rem;
+
+.analysis-p {
+    font-family: var(--font-hoves); 
+    font-size: 1rem;             /* Più grande */
+    color: #ddd;                 /* Più luminoso */
+    margin-top: 2rem; 
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.05); /* Sfondo leggero per staccare */
+    padding: 1rem;
+    border-radius: 4px;
+    border-left: 2px solid var(--accent-color);
 }
 .highlight { color: var(--accent-color); font-weight: bold; }
 
@@ -701,17 +769,44 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 
 /* Layout specifico Card Cubo */
 .card-layout-row { display: flex; gap: 2rem; align-items: center; }
-.text-col { flex: 1; }
-.stat-row { 
-    display: flex; justify-content: space-between; 
-    font-family: var(--font-mono); font-size: 0.8rem; 
-    border-bottom: 1px solid #222; padding: 0.8rem 0; color: #ccc;
+.text-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 2rem;
 }
-.stat-val { font-weight: bold; }
-.stat-val.low { color: #aaa; }
-.stat-val.med { color:#ff340c; }
-.stat-val.high { color: var(--accent-color); }
+.stat-row { 
+    display: flex; 
+    justify-content: space-between; /* Spinge nome a sx e valore a dx */
+    align-items: center;
+    font-family: 'TTHoves-Regular', sans-serif; 
+    font-size: 1rem; 
+    border-bottom: 1px solid #222; /* Riga sottile separatrice */
+    padding: 1.2rem 0; 
+    color: #ccc;
+}
+.stat-label-main {
+    font-size: 1.1rem;
+    color: #eee;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+.stat-label-sub {
+    font-family: 'Input-Mono', monospace;
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+}
 
+.stat-val { 
+    font-family: 'Input-Mono', monospace;
+    font-weight: bold; 
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+.stat-val.low, .stat-val.med, .stat-val.high { 
+    color: var(--accent-color); /* Sempre arancione/rosso come da foto */
+}
 .analysis-p {
     font-family: var(--font-hoves); font-size: 0.9rem; color: #888; margin-top: 2rem; line-height: 1.4;
 }
