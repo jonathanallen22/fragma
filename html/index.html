@@ -21,7 +21,6 @@
 
     <header id="global-header" class="hidden">
         <div class="header-left">
-
             <img src="assets/images/logo_fragma.svg" alt="FRAGMA" class="header-logo-img">
         </div>
         <div class="header-center">SYNTAX F-1</div>
@@ -58,58 +57,49 @@
                 </video>
             </div>
             <p class="knob-instruction">RUOTA LA MANOPOLA E CLICCA PER SCEGLIERE </p>
-            
         </footer>
     </section>
+
     <section id="scene-pre-edit" class="scene hidden">
-        <p class="pre-edit-title-gif">INTERAZIONE</p>
-        <p class="pre-edit-body-gif">Muovi le pedine per cambiare i valori dei parametri linguistici da zero a cinque e leggi in tempo reale come cambia la notizia che hai scelto di manipolare  </p>
+        <p class="pre-edit-title-gif">ISTRUZIONI PER L'INTERAZIONE</p>
+        <p class="pre-edit-body-gif">Muovi le pedine per cambiare i valori dei parametri linguistici da 0 a 5 e leggi in tempo reale come cambia il testo che hai scelto di manipolare</p>
 
         <div class="pre-edit-visual">
             <img src="./assets/video/instructions.gif" class="instruct-gif" alt="Instructions">
         </div>
 
        <div class="pre-edit-content">
-            
             <div class="param-row">
                 <h4>OPACITÀ</h4>
-                <p>Rendi il testo più criptico e di difficile interpretazione, nascondendo il significato diretto.</p>
+                <p>Rende il testo più criptico e difficile da interpretare, nascondendo il significato diretto.</p>
             </div>
-
             <div class="param-row">
                 <h4>DEUMANIZZAZIONE</h4>
                 <p>Rimuove elementi emotivi e personali, rendendo il tono freddo, distaccato e meccanico.</p>
             </div>
-
             <div class="param-row">
                 <h4>POLARIZZAZIONE</h4>
-                <p>Estremizzi le opinioni, dividendo nettamente i concetti in opposti senza sfumature.</p>
+                <p>Estremizza le opinioni, dividendo nettamente i concetti in opposti senza sfumature.</p>
             </div>
-
             <div class="param-row">
                 <h4>ASSERTIVITÀ</h4>
                 <p>Aumenta il livello di imposizione della notizia, influenzando la percezione con tono deciso.</p>
             </div>
-
             <div class="param-row">
                 <h4>MORALIZZAZIONE</h4>
                 <p>Introduce giudizi di valore etico, inquadrando i fatti in una prospettiva di giusto o sbagliato.</p>
             </div>
-
             <div class="param-row">
                 <h4>CARICO EMOTIVO</h4>
-                <p>Intensifichi i sentimenti espressi nel testo, cercando di suscitare una forte reazione.</p>
+                <p>Intensifica i sentimenti espressi nel testo, cercando di suscitare una forte reazione.</p>
             </div>
-
-        </div>
-
         </div>
 
         <div class="pre-edit-footer">
             <p class="blink-warning">PREMI PER INIZIARE A MODIFICARE</p>
         </div>
-
     </section>
+
     <section id="scene-edit" class="scene hidden">
         <div class="edit-text-wrapper">
             <h2 id="edit-headline">TITOLO NOTIZIA...</h2>
@@ -125,8 +115,24 @@
             <p id="param-info-desc">Descrizione della funzione del parametro...</p>
         </div>
 
-        <div class="edit-footer">
-            <div class="temp-controls">
+        <div id="inst-rotate-back" class="edit-side-instruction left hidden-inst">
+            <div class="knob-icon-small">
+                <video class="knob-video" autoplay loop muted playsinline>
+                    <source src="./assets/video/knob-loop.mp4" type="video/mp4">
+                </video>
+            </div>
+            <p class="knob-instruction small">RUOTA PER TORNARE INDIETRO</p>
+        </div>
+
+        <div id="inst-click-confirm" class="edit-side-instruction right hidden-inst">
+            <div class="knob-icon-small">
+                <video class="knob-video" autoplay loop muted playsinline>
+                    <source src="./assets/video/knob-loop.mp4" type="video/mp4">
+                </video>
+            </div>
+            <p class="knob-instruction small">CLICCA PER CONFERMARE</p>
+        </div>
+        <div class="temp-controls">
                 <div class="slider-row"><span>OPC</span><input type="range" id="param-opacita" class="cyber-range" min="0" max="100" value="0"></div>
                 <div class="slider-row"><span>DEU</span><input type="range" id="param-deumanizzazione" class="cyber-range" min="0" max="100" value="0"></div>
                 <div class="slider-row"><span>POL</span><input type="range" id="param-polarizzazione" class="cyber-range" min="0" max="100" value="0"></div>
@@ -135,7 +141,9 @@
                 <div class="slider-row"><span>EMO</span><input type="range" id="param-emotivo" class="cyber-range" min="0" max="100" value="0"></div>
             </div>
 
-            <div footer class="carousel-footer">
+        <div class="edit-footer">
+
+            <div class="edit-initial-instruction" id="inst-place-tokens">
                 <div class="knob-icon" id="pedina"> 
                    <svg width="103" height="303" viewBox="0 0 103 303" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_149_121)">
@@ -162,17 +170,14 @@
                     </svg>
  
                 </div>
-                 <p class="knob-instruction">POSIZIONA LE PEDINE </p>
-                
+                 <p class="knob-instruction">POSIZIONA LE PEDINE</p>
             </div>
         </div>
     </section>
 
-<section id="scene-processing" class="scene hidden">
+    <section id="scene-processing" class="scene hidden">
         <div id="stripes-container"></div>
-        
         <div class="vignette-overlay"></div>
-        
         <div class="processing-container">
             <div class="processing-header">
                 <span class="system-msg">REWRITING REALITY...</span>
@@ -184,15 +189,7 @@
         </div>
     </section>
 
-    </section>
-
     <div id="scene-impact-v2" class="scene hidden">
-        <div class="impact-hero" id="impact-hero">
-            <button class="impact-hero-close" id="impact-hero-close" aria-label="Chiudi banner">✕</button>
-            <img src="assets/images/lavori.jpeg" alt="Lavori in corso">
-            <div class="impact-hero-note">Questa schermata è temporaneamente in manutenzione</div>
-        </div>
-
         <div class="impact-v2-header">
             <div class="v2-subtitle">FINAL GENERATION</div>
         </div>
@@ -203,76 +200,77 @@
 
         <div class="impact-divider">IMPACT SIMULATION COMPLETED</div>
 
-        <div class="impact-grid">
+        <div class="impact-carousel-wrapper">
             
-            <div class="impact-card">
-                <div class="card-title">IMPATTO DELLA MANIPOLAZIONE</div>
-                <div class="card-subtitle">EROSIONE DELL'AUTONOMIA EPISTEMICA</div>
+            <div class="impact-slide active" id="slide-1">
+                <div class="slide-header">
+                    <div class="card-title">IMPATTO DELLA MANIPOLAZIONE</div>
+                    <div class="card-subtitle">EROSIONE DELL'AUTONOMIA EPISTEMICA</div>
+                </div>
                 
-                <div id="canvas-surface" class="canvas-3d-container"></div>
+                <div id="canvas-surface" class="canvas-3d-container carousel-mode"></div>
                 
-                <div class="card-footer-text">
-                    Il testo sarà in grado di aggirare le difese razionali del cervello.<br>
-                    Verrà trasmesso con una manipolazione fluida e naturale.
+                <div class="card-footer-text carousel-mode">
+                    L'analisi euristica rileva una riconfigurazione semantica profonda. Il messaggio manipolato possiede un indice di penetrazione subliminale in grado di aggirare i filtri cognitivi standard.
+                    <br><br>Livello di inibizione previsto: <span id="val-inibizione" class="highlight">87%</span>
                 </div>
             </div>
 
-            <div class="impact-card">
-                <div class="card-title">PERSISTENZA COGNITIVA</div>
-                <div class="card-subtitle">INFILTRAZIONE DEL CONCETTO</div>
+            <div class="impact-slide" id="slide-2">
+                <div class="slide-header">
+                    <div class="card-title">PERSISTENZA COGNITIVA</div>
+                    <div class="card-subtitle">INFILTRAZIONE DEL CONCETTO</div>
+                </div>
+
+                <div id="canvas-lines" class="canvas-3d-container carousel-mode"></div>
                 
-                <div id="canvas-lines" class="canvas-3d-container"></div>
-                
-                <div class="card-footer-text">
-                    La struttura sintattica bypassa la memoria a breve termine.<br>
-                    Il concetto rimarrà radicato nel <span id="val-radicamento" style="color:#ff340c">78%</span> dei soggetti.
+                <div class="card-footer-text carousel-mode">
+                    Il tracciamento mnemonico evidenzia una persistenza anomala nei circuiti a breve termine. La sintassi alterata crea loop ricorsivi che impediscono la naturale decadenza dell'informazione falsa.
+                    <br><br>Radicamento concetto: <span id="val-radicamento" class="highlight">78%</span>
                 </div>
             </div>
 
-            <div class="impact-card full-width">
-                <div class="card-layout-row">
-                    <div class="text-col">
-                        <div class="card-title">INIBIZIONE DEL PENSIERO CRITICO</div>
-                        <div class="card-subtitle">IMPATTO CRITICO SULLE AREE CEREBRALI</div>
-                        
-                        <div class="stat-row">
-                            <div>
-                                <span class="stat-label-main">Trigger Emotivo</span>
-                                <span class="stat-label-sub">[AMIGDALA]</span>
-                            </div>
-                            <span id="stat-amigdala" class="stat-val">BASSO</span>
-                        </div>
+            <div class="impact-slide" id="slide-3">
+                <div class="slide-header">
+                    <div class="card-title">INIBIZIONE PENSIERO CRITICO</div>
+                    <div class="card-subtitle">IMPATTO SULLE AREE CEREBRALI</div>
+                </div>
 
+                <div class="slide-content-row">
+                    <div class="stats-sidebar-clean">
                         <div class="stat-row">
-                            <div>
-                                <span class="stat-label-main">Filtro Logico</span>
-                                <span class="stat-label-sub">[CORTECCIA PREFRONTALE]</span>
-                            </div>
-                            <span id="stat-logica" class="stat-val">ELEVATO</span>
+                            <span class="stat-label">Trigger Emotivo [AMIGDALA]</span>
+                            <span id="stat-amigdala" class="stat-val low">BASSO</span>
                         </div>
-
                         <div class="stat-row">
-                            <div>
-                                <span class="stat-label-main">Bias di Conferma</span>
-                                <span class="stat-label-sub">[STRIATO VENTRALE]</span>
-                            </div>
-                            <span id="stat-bias" class="stat-val">MEDIO</span>
+                            <span class="stat-label">Filtro Logico [PREFRONTALE]</span>
+                            <span id="stat-logica" class="stat-val high">ELEVATO</span>
                         </div>
-
-                        <div class="card-footer-text" style="margin-top: 2rem;">
-                            Il testo modificato impatterà maggiormente sul pensiero critico. 
-                            La veridicità non sarà messa in dubbio.
+                        <div class="stat-row">
+                            <span class="stat-label">Bias Conferma [STRIATO]</span>
+                            <span id="stat-bias" class="stat-val med">MEDIO</span>
                         </div>
                     </div>
-                    
-                    <div id="canvas-cube" class="canvas-3d-container big"></div>
+
+                    <div id="canvas-cube" class="canvas-3d-container carousel-mode big"></div>
+                </div>
+
+                <div class="card-footer-text carousel-mode">
+                    Rilevata saturazione dei recettori nel sistema limbico. La veridicità del contenuto non viene processata dalla corteccia prefrontale, generando un'accettazione passiva immediata.
                 </div>
             </div>
+
+            <div class="carousel-progress-container">
+                <div class="carousel-progress-bar" id="carousel-bar"></div>
+            </div>
+
         </div>
 
         <div class="v2-footer">
             <div class="blink-warning">PRESS TO RESTART EXPERIENCE</div>
-            </div>
-    </div> <script type="module" src="js/main.js"></script>
+        </div>
+    </div> 
+    
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
