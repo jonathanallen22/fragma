@@ -23,9 +23,12 @@ const llmClient = new LLMClient("http://localhost:5001/generate");
 
 let currentGeneratedBody = ""; 
 let impactCarouselInterval = null;
-
-// Stato interazione Edit
 let isEditInteractionStarted = false;
+
+document.addEventListener("DOMContentLoaded", () => {
+    const knobVideos = document.querySelectorAll('.knob-video');
+    knobVideos.forEach(video => { video.playbackRate = 0.5; });
+});
 
 if (impactHeroClose && impactHero) {
     impactHeroClose.addEventListener('click', () => { impactHero.classList.add('hidden-banner'); });
@@ -129,22 +132,28 @@ function updateLiveText() {
     }, () => { currentGeneratedBody = ""; }, (err) => { console.error(err); bodyEl.innerText = "// ERROR //"; }).then(() => { bodyEl.style.opacity = 1; });
 }
 
-// --- GESTIONE CAMBIO ISTRUZIONI EDIT ---
+// --- GESTIONE ISTRUZIONI EDIT ---
 function checkEditInteraction() {
-    // Se siamo in edit e non abbiamo ancora interagito
     if (sceneMgr.currentScene === 'edit' && !isEditInteractionStarted) {
         isEditInteractionStarted = true;
-        
-        // Nascondi istruzione iniziale
         const initialInst = document.getElementById('inst-place-tokens');
         if(initialInst) initialInst.classList.add('hidden-inst');
-
-        // Mostra istruzioni laterali
         const leftInst = document.getElementById('inst-rotate-back');
         const rightInst = document.getElementById('inst-click-confirm');
         if(leftInst) leftInst.classList.remove('hidden-inst');
         if(rightInst) rightInst.classList.remove('hidden-inst');
     }
+}
+
+// --- TOGGLE GUI ---
+const toggleBtn = document.getElementById('toggle-ui-btn');
+const controlsPanel = document.getElementById('edit-controls');
+if (toggleBtn && controlsPanel) {
+    toggleBtn.addEventListener('click', () => {
+        controlsPanel.classList.toggle('minimized');
+        if (controlsPanel.classList.contains('minimized')) { toggleBtn.innerText = "SHOW PARAMETERS"; } 
+        else { toggleBtn.innerText = "HIDE PARAMETERS"; }
+    });
 }
 
 // --- NAVIGATION ---
@@ -192,10 +201,7 @@ sliders.forEach(slider => slider.addEventListener('input', (e) => {
     const paramId = e.target.id.replace('param-', '');
     semanticGraph.updateParams({ [paramId]: parseFloat(e.target.value) });
     updateParamInfoDisplay(paramId);
-    
-    // Trigger cambio istruzioni
     checkEditInteraction();
-    
     updateLiveText();
 }));
 
@@ -283,47 +289,68 @@ function initImpact3D() {
     if(impactManagerV2) impactManagerV2.init(params);
 }
 
+// --- LOGICA CAROSELLO E BARRA (FIX ANIMATION RESTART) ---
 function startCarousel() {
+    // 1. Pulisci timer precedente
     if (impactCarouselInterval) clearInterval(impactCarouselInterval);
+
     const slides = document.querySelectorAll('.impact-slide');
     const progressBar = document.getElementById('carousel-bar');
     if(slides.length === 0) return;
 
     let activeIndex = 0;
+
+    // 2. Reset iniziale
     slides.forEach((s) => s.classList.remove('active', 'prev'));
     slides[0].classList.add('active');
 
-    if(progressBar) {
-        progressBar.classList.remove('animating');
-        void progressBar.offsetWidth; 
-        progressBar.classList.add('animating');
-    }
+    // Funzione helper per riavviare animazione barra
+    const resetProgressBar = () => {
+        if(progressBar) {
+            progressBar.classList.remove('animating');
+            // Force reflow
+            void progressBar.offsetWidth;
+            // Aggiungi di nuovo
+            progressBar.classList.add('animating');
+        }
+    };
 
+    // Avvia subito la barra per la prima slide
+    resetProgressBar();
+
+    // 3. Timer 15 Secondi
     impactCarouselInterval = setInterval(() => {
+        // Slide corrente esce
         slides[activeIndex].classList.remove('active');
         slides[activeIndex].classList.add('prev');
+
+        // Prossima slide entra
         const nextIndex = (activeIndex + 1) % slides.length;
         slides[nextIndex].classList.remove('prev');
         slides[nextIndex].classList.add('active');
+
         activeIndex = nextIndex;
 
+        // Resize grafici per sicurezza
         if(impactManagerV2) impactManagerV2.handleResize();
 
-        if(progressBar) {
-            progressBar.classList.remove('animating');
-            void progressBar.offsetWidth; 
-            progressBar.classList.add('animating');
-        }
-    }, 10000); 
+        // Riavvia barra
+        resetProgressBar();
+
+    }, 15000); 
 }
 
 function resetExperience() {
     console.log("🔄 RESET...");
     if (impactCarouselInterval) { clearInterval(impactCarouselInterval); impactCarouselInterval = null; }
+    
+    // Ferma barra
     const progressBar = document.getElementById('carousel-bar');
     if(progressBar) progressBar.classList.remove('animating');
+
     const v2 = document.getElementById('scene-impact-v2');
     if(v2) { v2.classList.remove('active'); v2.classList.add('hidden'); }
+    
     currentCardIndex = 0; currentGeneratedBody = ""; 
     const sliders = document.querySelectorAll('.cyber-range'); sliders.forEach(slider => slider.value = 0);
     if(semanticGraph) {
@@ -331,7 +358,7 @@ function resetExperience() {
         if(semanticGraph.updateVisuals) semanticGraph.updateVisuals();
     }
     
-    // RESET ISTRUZIONI EDIT
+    // Reset Istruzioni Edit
     isEditInteractionStarted = false;
     const initialInst = document.getElementById('inst-place-tokens');
     if(initialInst) initialInst.classList.remove('hidden-inst');

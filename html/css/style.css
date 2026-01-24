@@ -577,7 +577,7 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 }
 
 /* =========================================
-   SCENA IMPACT V2 - STILE SCREENSHOT
+   SCENA IMPACT V2 - STILE DEFINITIVO
    ========================================= */
 #scene-impact-v2 {
     background-color: #000;
@@ -585,247 +585,172 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Permette scroll se necessario */
+    overflow-y: auto;
     color: #fff;
 }
 
-.impact-hero {
-    position: fixed;
-    top: 8vh;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 50;
-    pointer-events: none;
-    width: min(80vw, 1000px);
-    display: flex;
-    justify-content: center;
+/* Nascondi elementi vecchi */
+#impact-hero { display: none !important; }
+
+/* Header Globale della sezione */
+.impact-v2-header { text-align: center; margin-bottom: 3vh; }
+.v2-subtitle { 
+    font-family: var(--font-hoves); font-size: 0.8rem; color: #888; 
+    letter-spacing: 0.2rem; text-transform: uppercase; 
 }
 
-.impact-hero img {
-    width: 100%;
-    max-height: 40vh;
-    object-fit: cover;
-    border: 1px solid #222;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+/* Box Articolo Finale */
+.final-article-box {
+    border: 1px solid #333;
+    padding: 2rem;
+    background: #080808;
+    margin-top: 2vh;
+    max-height: 40vh; 
+    overflow-y: auto;
+    overflow-x: hidden; 
 }
 
-.impact-hero-note {
-    position: absolute;
-    bottom: 300px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-hoves);
-    font-size: 4rem;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.02em;
-    pointer-events: none;
+/* Override stili card dentro il box finale */
+.final-article-box .card {
+    width: 100% !important; height: auto !important; transform: none !important; 
+    opacity: 1 !important; filter: none !important; background: transparent !important;
+    border: none !important; padding:0; margin-top: 1vh !important;
 }
-
-.impact-hero-close {
-    position: absolute;
-    top: -14px;
-    right: -14px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid #444;
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.final-article-box .corriere-headline, .final-article-box .sky-headline, .final-article-box .twitter-body {
+    white-space: normal !important; word-wrap: break-word !important; max-width: 100% !important;
 }
-
-.impact-hero-close:hover { background: rgba(255,52,12,0.85); transform: scale(1.05); }
-.impact-hero-close:active { transform: scale(0.97); }
-
-.hidden-banner { display: none; }
-
-/* Header & Divider */
-.impact-v2-header { text-align: center; margin-bottom: 2vh; }
-.v2-subtitle { font-family: var(--font-hoves); font-size: 0.8rem; color: #888; letter-spacing: 0.2rem; text-transform: uppercase; }
 
 .impact-divider {
     text-align: center; font-family: var(--font-hoves); font-size: 1.2rem; 
     letter-spacing: 0.2rem; color: #fff; margin: 3vh 0; text-transform: uppercase;
 }
 
-/* Articolo Box */
-/* --- FIX CARD FINALE (TESTO TAGLIATO) --- */
-.final-article-box {
+/* --- CAROSELLO WRAPPER --- */
+.impact-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 65vh; /* Aumentato leggermente per dare respiro */
     border: 1px solid #333;
-    padding: 2rem; /* Spazio interno */
-    background: #080808;
-    margin-top: 3vh;
-    max-height: 45vh; /* Un po' più alto */
-    overflow-y: auto;
-    overflow-x: hidden; /* Vietato scroll orizzontale */
+    background: #050505;
+    overflow: hidden;
+    margin-bottom: 2vh;
 }
 
-/* Forziamo la card clonata a comportarsi bene */
-.final-article-box .card {
-    width: 100% !important;
-    height: auto !important;
-    transform: none !important; /* Rimuove rotazioni o scale residue */
-    opacity: 1 !important;
-    filter: none !important;
-    background: transparent !important;
-    border: none !important;
-    padding:0;
-    margin-top: 1vh !important;
+.impact-slide {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    padding: 3rem 4rem; /* Padding aumentato */
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+    background: #050505;
+    z-index: 1;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translateX(100%); 
+}
+.impact-slide.active { transform: translateX(0%); z-index: 10; }
+.impact-slide.prev { transform: translateX(-100%); z-index: 5; }
+
+/* --- HEADER SLIDE (MODIFICA RICHIESTA: FLEX ROW) --- */
+.slide-header {
+    display: flex;
+    justify-content: space-between; /* Titolo a sx, Sottotitolo a dx */
+    align-items: baseline; /* Allinea alla base del testo */
+    padding-bottom: 1rem !important;
+    border-bottom: 1px solid #333;
+    margin-bottom: 2rem !important;
+    flex-shrink: 0;
+    width: 100%;
 }
 
-/* Testo che va a capo correttamente */
-.final-article-box .corriere-headline,
-.final-article-box .sky-headline,
-.final-article-box .twitter-body {
-    white-space: normal !important;
-    word-wrap: break-word !important;
-    max-width: 100% !important;
-}
-
-/* --- FIX TITOLI (PIÙ GRANDI E VISIBILI) --- */
 .card-title {
-    font-family: 'TTHoves-Regular', sans-serif; /* Font più pulito */
-    font-size: 2.2rem; /* Molto più grande */
+    font-family: 'TTHoves-Regular', sans-serif; 
+    font-size: 3rem; /* Molto più grande */
     font-weight: 400;
     color: #fff; 
-    margin-bottom: 0.2rem; 
+    margin: 0;
     text-transform: uppercase;
     line-height: 1;
-    border: none; /* Rimosso bordo laterale se c'era */
-    padding-left: 0;
 }
 
 .card-subtitle {
     font-family: 'Input-Mono', monospace; 
-    font-size: 0.9rem; 
-    color: #666; 
-    /* Margine ridotto drasticamente per avvicinare il grafico */
-    margin-bottom: 0.5rem !important; 
-    margin-top: 0.2rem;
+    font-size: 1.1rem; /* Più grande di prima */
+    color: #888; /* Grigio chiaro ma distinto */
+    margin: 0;
     text-transform: uppercase; 
     letter-spacing: 0.05rem;
-    padding-left: 0;
+    text-align: right;
 }
 
-/* --- ETICHETTE PER I GRAFICI (LABEL ASSI) --- */
-.chart-overlay-label {
-    white-space: pre; /* Rispetta i \n */
-    font-weight: bold;
-}
-
-/* Griglia */
-.impact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 2vh;
-}
-
-.impact-card {
-    border: 1px solid #333;
-    background: #050505;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-}
-
-.impact-card.full-width {
-    grid-column: 1 / -1;
-}
-
-/* Tipografia Card */
-card-footer-text {
-    font-family: 'TTHoves-Regular', sans-serif; 
-    font-size: 1rem;          
-    color: #999;                 
-    margin-top: auto; /* Spinge in basso */
-    line-height: 1.4;            
-    border-top: none; /* Rimosso bordo superiore */
-    padding-top: 1rem;
-    max-width: 90%;
-}
-
-.analysis-p {
-    font-family: var(--font-hoves); 
-    font-size: 1rem;             /* Più grande */
-    color: #ddd;                 /* Più luminoso */
-    margin-top: 2rem; 
-    line-height: 1.6;
-    background: rgba(255, 255, 255, 0.05); /* Sfondo leggero per staccare */
-    padding: 1rem;
-    border-radius: 4px;
-    border-left: 2px solid var(--accent-color);
+/* --- DESCRIZIONE IN BASSO (TESTO PIÙ GRANDE) --- */
+.card-footer-text.carousel-mode {
+    margin-top: auto;
+    font-family: var(--font-hoves);
+    font-size: 1.6rem; /* Aumentato considerevolmente */
+    line-height: 1.4;
+    color: #eee; /* Quasi bianco */
+    max-width: 95%;
 }
 .highlight { color: var(--accent-color); font-weight: bold; }
 
-/* Canvas Container per Three.js */
-.canvas-3d-container {
-    width: 100%;
-    height: 250px; /* Altezza fissa per i grafici */
-    position: relative;
-    overflow: hidden;
-    /* border: 1px dashed #222; Debug area */
+/* --- CANVASES --- */
+.canvas-3d-container.carousel-mode {
+    width: 100%; flex-grow: 1;
+    height: 100% !important; min-height: 350px !important; 
+    border: none;
+    background: radial-gradient(circle at center, #111 0%, #000 80%);
 }
-.canvas-3d-container.big {
-    height: 350px;
+.canvas-3d-container.carousel-mode.big {
+    flex: 1; width: 100%; height: 100% !important; min-height: 350px !important;
+    overflow: visible !important; 
 }
 
-/* Layout specifico Card Cubo */
-.card-layout-row { display: flex; gap: 2rem; align-items: center; }
-.text-col {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-right: 2rem;
+/* --- ETICHETTE DENTRO I GRAFICI --- */
+.chart-overlay-label {
+    white-space: pre; 
+    font-weight: bold;
+    /* Colore e size gestiti da JS, ma forziamo base qui */
+    color: #fff !important; 
+    text-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
-.stat-row { 
-    display: flex; 
-    justify-content: space-between; /* Spinge nome a sx e valore a dx */
-    align-items: center;
-    font-family: 'TTHoves-Regular', sans-serif; 
-    font-size: 1rem; 
-    border-bottom: 1px solid #222; /* Riga sottile separatrice */
-    padding: 1.2rem 0; 
-    color: #ccc;
+
+/* --- LAYOUT SLIDE 3 (SFERE) --- */
+.slide-content-row {
+    display: flex; width: 100%; height: 100%; min-height: 400px;
+    gap: 4rem; align-items: center; justify-content: space-between;
 }
-.stat-label-main {
-    font-size: 1.1rem;
-    color: #eee;
-    display: block;
-    margin-bottom: 0.2rem;
+.stats-sidebar-clean {
+    width: 35%; flex-shrink: 0; display: flex; flex-direction: column;
+    justify-content: center; gap: 2rem; 
 }
-.stat-label-sub {
-    font-family: 'Input-Mono', monospace;
-    font-size: 0.7rem;
-    color: #666;
+.stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #444; padding-bottom: 0.8rem;
+}
+.stat-label {
+    font-family: var(--font-hoves); font-size: 1.2rem !important; /* Più grandi */
+    color: #fff; /* Bianchi */
     text-transform: uppercase;
 }
+.stat-val {
+    font-family: var(--font-mono); font-size: 1.4rem !important; /* Più grandi */
+    font-weight: bold;
+}
+.stat-val.low { color: #aaa; }
+.stat-val.med { color: #ff340c; }
+.stat-val.high { color: #ff340c; text-shadow: 0 0 8px #ff340c; }
 
-.stat-val { 
-    font-family: 'Input-Mono', monospace;
-    font-weight: bold; 
-    font-size: 0.9rem;
-    text-transform: uppercase;
+/* --- BARRA DI PROGRESSO (15 SECONDI) --- */
+.carousel-progress-container {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 6px; background: #222; z-index: 20;
 }
-.stat-val.low, .stat-val.med, .stat-val.high { 
-    color: var(--accent-color); /* Sempre arancione/rosso come da foto */
+.carousel-progress-bar { height: 100%; background: #ffffff; width: 0%; }
+.carousel-progress-bar.animating { 
+    animation: fillProgress 15s linear forwards !important; /* MODIFICATO A 15s */
 }
-.analysis-p {
-    font-family: var(--font-hoves); font-size: 0.9rem; color: #888; margin-top: 2rem; line-height: 1.4;
-}
+@keyframes fillProgress { from { width: 0%; } to { width: 100%; } }
 
-/* Footer */
 .v2-footer { margin-top: auto; text-align: center; padding: 2rem 0; }
 .blink-warning { animation: blink 2s infinite; color: var(--accent-color); font-family: var(--font-mono); margin-bottom: 1rem;}
-
-/* Nascondi vecchia scena impact */
-#scene-impact { display: none !important; }
 
 
 /* =========================================
