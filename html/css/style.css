@@ -418,7 +418,25 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
     display: none;
 }
 
+.corriere-logo[src*="nyt.svg"] {
+    transform: scale(13);
+    padding-top: 1.5px;  
+}
+.corriere-logo[src*="repubblica.svg"] {
+    transform: scale(10);
+    margin-bottom: 15px;
+    padding-top: 2px;
+}
+.corriere-logo[src*="washingtonpost.svg"] {
+    transform: scale(13);
+    padding-top: 1.5px; 
+    margin-bottom: 10px; 
+}
+.sky-logo[src*="savethechildren.svg"] {
+    transform: scale(1.5);
+    padding-left: 13px;
 
+}
 /* --- 2. STILE SKY (Moderno/Broadcast) --- */
 .card.is-sky {
     background: rgba(10,10,10,0.9);
@@ -597,6 +615,7 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 .v2-subtitle { 
     font-family: var(--font-hoves); font-size: 0.8rem; color: #888; 
     letter-spacing: 0.2rem; text-transform: uppercase; 
+    display: none;
 }
 
 /* Box Articolo Finale */
@@ -621,7 +640,7 @@ svg { width: 95%; height: 95%; overflow: visible;} /* Un po' di margine interno 
 }
 
 .impact-divider {
-    text-align: center; font-family: var(--font-hoves); font-size: 1.2rem; 
+    text-align: center; font-family: var(--font-hoves); font-size: 2rem; 
     letter-spacing: 0.2rem; color: #fff; margin: 3vh 0; text-transform: uppercase;
 }
 
