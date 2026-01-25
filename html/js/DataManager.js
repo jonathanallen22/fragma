@@ -26,6 +26,7 @@ export const CARDS_DATA = [
         template: "twitter",
         date: "09 DICEMBRE 2025",
         author: "Giorgia Meloni",
+        handle: "@GiorgiaMeloni",
         headline: "",
         body: "Sacrosanta la decisione della Corte costituzionale di dichiarare inammissibile il referendum proposto dai radicali sull’omicidio del consenziente, anche se sano. Un quesito inaccettabile ed estremo che avrebbe scardinato il nostro ordinamento giuridico, da sempre orientato alla difesa della vita umana e alla tutela dei più fragili e deboli. Una sentenza di buon senso. C’è ancora spazio nel nostro ordinamento per difendere il valore della vita, come Fratelli d’Italia intende fare con il suo impegno",
         logo: "assets/images/x.svg"
@@ -105,31 +106,86 @@ export const CARDS_DATA = [
     },
     {
         id: 10,
-        source: "Financial Times",
-        date: "23 DICEMBRE 2025",
-        author: "ECONOMICS",
-        headline: "Universal Basic Income: Germany launches the largest pilot program in history",
-        body: "Starting January 1st, 5 million citizens will receive the 'Citizens Dividend'. Critics argue it will spike inflation, while supporters see it as the only answer to AI automation.",
-        logo: "assets/images/logo_ft.svg"
+        template: "corriere",
+        source: "Corriere della Sera",
+        date: "7 NOVEMBRE 2025",
+        author: "Di Alessia Conzonato",
+        headline: "Tutte le vittime del clima",
+        body: "Il cambiamento climatico uccide già migliaia di persone. Il nuovo rapporto Lancet countdown, che dal 2016 studia il legame tra il riscaldamento globale causato dagli esseri umani e la salute, calcola che i decessi legati al calore sono aumentati del 23 per cento dagli anni novanta. Tra il 2012 e il 2021 nel mondo sono stati registrati in media ogni anno somila morti associate alle temperature elevate: 1.500 morti al giorno. Qualsiasi altro fattore che causasse una mortalità così elevata susciterebbe una reazione forte della comunità internazionale.",
+        logo: "assets/images/corriere.svg"
     },
     {
         id: 11,
-        source: "The Washington Post",
-        date: "24 DICEMBRE 2025",
-        author: "DEMOCRACY DIES IN DARKNESS",
-        headline: "Deepfake Election: Senate passes emergency bill to watermark all video content",
-        body: "In a rare bipartisan vote, Congress has mandated cryptographic watermarks for all media content to combat the wave of hyper-realistic AI propaganda generated videos.",
-        logo: "assets/images/logo_wapo.svg"
+        source: "TWITTER",
+        template: "twitter",
+        handle: "@OMS",
+        date: "10 NOVEMBRE 2025",
+        author: "Tedros Adhanom Ghebreyesus",
+        headline: "",
+        body: "Ci sarà una prossima volta. La storia ci insegna che la prossima pandemia sarà una questione di quando, non se. Potrebbe essere causata da un virus influenzale, o da un nuovo coronavirus, oppure potrebbe essere causata da un nuovo agente patogeno che ancora non conosciamo, quella che chiamiamo Malattia X. Siamo pronti adesso? Non ancora. Ecco perché l’accordo sulla pandemia è fondamentale per l’umanità,",
+        logo: "assets/images/x.svg"
     },
     {
         id: 12,
-        source: "National Geographic",
-        date: "25 DICEMBRE 2025",
-        author: "SCIENCE",
-        headline: "The Great Reef Revival: New coral species adapts to warmer oceans",
-        body: "A glimmer of hope from the Pacific. Marine biologists have discovered a heat-resistant coral strain that is repopulating the bleached sections of the Great Barrier Reef at record speeds.",
-        logo: "assets/images/logo_natgeo.svg"
-    }
+        template: "sky",
+        source: " SkyTG24",
+        date: "24 FEBBRAIO 2022",
+        author: "REDAZIONE ESTERI",
+        headline: "Speciale Ucraina: è guerra.",
+        body: "Con un discorso alla nazione pronunciato alle 6 del mattino ora di Mosca il presidente russo, Vladimir Putin, ha annunciato l’attacco all’Ucraina. Subito si sono avvertite forti esplosioni in diverse città ucraine non solo a ridosso del Donbass ma anche a Odessa, Kharvik, Mariupol, Leopoli, Kramatorsk e nella capitale Kiev, dove i soldati russi avrebbero tentato di prendere il controllo dell’aeroporto. Testimoni oculari riferiscono all’Ansa che a Kiev si stanno formando lunghe code ai benzinai e il traffico nelle strade è intenso poiché molti residenti starebbero cercando di lasciare la città. Le truppe di Mosca – secondo quanto riferiscono i comandi militari ucraini – hanno attraversato la frontiera in vari punti, entrando nel paese oltre che dal Donbass anche dalla Bielorussia e dalla Crimea. ",
+        logo: "assets/images/sky.svg"
+    },
+    {
+        id: 13,
+        source: "The New York Times",
+        template: "corriere",
+        date: "03 DICEMBRE 2025",
+        author: "BY Miguel Syjuco",
+        headline: "Lo scandalo corruzione scuote le Filippine.",
+        body: "Negli ultimi mesi centinaia di migliaia di persone sono scese in strada a manifestare a Manila contro la corruzione. Ciò a seguito di uno scandalo scoppiato la scorsa estate, nel quale esponenti politici di spicco sono stati accusati di aver intascato miliardi di pesos in tangenti nell’ambito di contratti relativi a progetti infrastrutturali volti a mitigare gli effetti delle inondazioni che sono risultati insufficienti o non sono mai stati realizzati.Le proteste hanno subìto una notevole intensificazione dopo che a novembre due tifoni abbattutisi in rapida successione sulle Filippine hanno causato circa 300 morti, oltre a distruzioni diffuse, con danni ingenti all’economia dovuti soprattutto alla lentezza nella ripresa.",
+        logo: "assets/images/nyt.svg",
+    },
+    {
+        id: 14,
+        source: "La Repubblica",
+        date: "",
+        template: "corriere",
+        author: "",
+        headline: "Migranti, dieci anni di soccorsi nel Mediterraneo: 180 mila persone salvate dalle Ong",
+        body: "A dieci anni dall’inizio delle operazioni di ricerca e soccorso condotte dalle Ong nel Mediterraneo centrale il bilancio è quello di una crisi umanitaria senza precedenti. Dal 2015 si stima che oltre 21.000 persone migranti siano morte o disperse, in un contesto segnato dal progressivo arretramento degli Stati europei nelle attività di soccorso. Per Rossella Miccio, presidente di Emergency, “è fondamentale tornare a dare priorità al tema del salvataggio delle vite in mare, perché in questi anni sono morte troppe persone e perché sempre di più la politica italiana ed europea persevera nello smantellamento del nostro sistema di diritti e di valori a scapito della vita di decine di migliaia di persone”.",
+        logo: "assets/images/repubblica.svg"
+    },
+    {
+        id: 15,
+        source: "TWITTER",
+        template: "twitter",
+        handle: "@MatteoSalvini",
+        date: "27 NOVEMBRE 2025",
+        author: "Matteo Salvini",
+        headline: "",
+        body: "Il Ponte sullo Stretto è un'opera che gli italiani aspettano da decenni, moderna, sostenibile e sicura. La Corte dei Conti ha fatto alcuni rilievi: ci prenderemo qualche mese in più, ma li supereremo rispondendo punto su punto, insieme a tecnici, avvocati e decine di professori, per dare agli italiani ciò che meritano. Il mio obiettivo è fare, non polemizzare: i miei pensieri me li tengo per me.",
+        logo: "assets/images/x.svg"
+    },
+    {
+        id: 16,
+        template: "sky",
+        source: " National Geographic",
+        date: "",
+        author: "ESTERI",
+        headline: "Guerra Russia-Ucraina: il caos",
+        body: "Mentre in Italia e nel resto del mondo le piazze si riempiono per manifestare contro la guerra, il cielo sopra a Kiev continua a essere illuminato dai bagliori delle esplosioni. Truppe russe sono entrate a Kharkiv e hanno colpito un sito di smaltimento di rifiuti radioattivi a Kiev. Putin ha ordinato la chiusura dello spazio aereo russo alle compagnie legate o registrate in Lettonia, Estonia e Slovenia. Il Presidente americano Joe Biden ha dichiarato che l'alternativa alle sanzioni economiche imposte alla Russia è la Terza Guerra Mondiale, ma la presidente della Commissione europea, Ursula von der Leyen, ha annunciato che sarà impedito a Putin di usare 'il suo forziere da guerra'.",
+        logo: "assets/images/nationalgeographic.svg"
+    },
+    {
+        id: 17,
+        source: "Washington Post",
+        date: "",
+        template: "corriere",
+        author: "",
+        headline: "Sparatoria vicino la Casa Bianca: fermato un afghano.",
+        body: "Sparatoria nel centro di Washington Dc, nei pressi della Casa Bianca. Due membri della Guardia Nazionale mercoledì sono rimasti feriti gravemente a seguito dei colpi d’arma da fuoco. “I due militari sono in condizioni critiche”, hanno dichiarato il direttore dell’FBI Kash Patel e il sindaco di Washington, DC, Muriel Bowser, durante una conferenza stampa. Ferito anche l’attentatore, ma non è in pericolo di vita.Non è chiara, al momento, la dinamica della sparatoria. ",
+        logo: "assets/images/washingtonpost.svg"
+    },
 ];
 
 export function getCardById(id) {

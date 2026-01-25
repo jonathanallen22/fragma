@@ -128,7 +128,7 @@ export class Impact3DManager {
         return group;
     }
 
-    // --- CHART 1: SURFACE (INVARIATO DAL TUO CODICE) ---
+   // --- CHART 1: SURFACE (FIXED: GRIGLIA FORZATA SOPRA A TUTTO) ---
     createSurfaceChart(containerId, params) {
         const result = this.createBaseScene(containerId);
         if(!result) return;
@@ -142,6 +142,7 @@ export class Impact3DManager {
         const axisMat = new THREE.LineBasicMaterial({ color: this.whiteColor, linewidth: 2 });
         const size = 2.0; 
 
+        // 1. ASSI (Livello Base - Dietro)
         scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0, size, 0)]), axisMat));
         scene.add(this.createArrow(new THREE.Vector3(0, size, 0), {x:0, y:0, z:0})); 
 
@@ -155,6 +156,23 @@ export class Impact3DManager {
         this.addLabel(containerId, "MODIFICA\nMESSAGGIO", 85, 88, 'left', '1rem', '#fff'); 
         this.addLabel(containerId, "SFORZO\nCOGNITIVO", 15, 88, 'right', '1rem', '#fff');
 
+        // 2. HIGHLIGHT AREA (RETTANGOLO - Livello 1)
+        const hlGeo = new THREE.PlaneGeometry(1, 1);
+        const highlightMat = new THREE.MeshBasicMaterial({
+            color: this.accentColor, 
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide,
+            depthWrite: false 
+        });
+        
+        const highlightPlane = new THREE.Mesh(hlGeo, highlightMat);
+        highlightPlane.rotation.x = -Math.PI / 2; 
+        highlightPlane.renderOrder = 1; 
+        scene.add(highlightPlane);
+
+        // 3. GRIGLIA ONDULATA (FORZATA SOPRA - Livello 10)
+        // depthTest: false fa sì che venga disegnata SOPRA tutto ciò che c'è prima (Assi e Rettangolo)
         const planeSize = 2.4; 
         const segments = 18;
         const geometry = new THREE.PlaneGeometry(planeSize, planeSize, segments, segments);
@@ -163,30 +181,58 @@ export class Impact3DManager {
             color: 0xaaaaaa, 
             wireframe: true, 
             transparent: true, 
-            opacity: 0.35,
-            side: THREE.DoubleSide
+            opacity: 0.3, // Leggermente più visibile
+            side: THREE.DoubleSide,
+            depthTest: false // MAGIA: Ignora la profondità reale e si stampa sopra
         });
         const plane = new THREE.Mesh(geometry, material);
+        const gridHeight = 0.7; 
+        
         plane.rotation.x = -Math.PI / 2; 
-        plane.position.set(size/2, 0.7, size/2); 
+        plane.position.set(size/2, gridHeight, size/2); 
+        plane.renderOrder = 10; 
+        
         scene.add(plane);
 
+        // 4. SFERA E LINEA (SUPER LIVELLO - 30)
+        // Disegnati per ultimi, sopra anche alla griglia "magica"
         const dotRadius = 0.06; 
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(dotRadius), new THREE.MeshBasicMaterial({ color: this.accentColor }));
+        
+        // Importante: transparent: true per rispettare il renderOrder nel bucket trasparente
+        const dotMat = new THREE.MeshBasicMaterial({ 
+            color: this.accentColor,
+            transparent: true, 
+            opacity: 1.0 
+        });
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(dotRadius), dotMat);
+        
+        dot.renderOrder = 30; // Vince su tutto
         scene.add(dot);
 
-        const pX = (params.deumanizzazione + params.polarizzazione) / 200 * size;
-        const pZ = (params.opacita + params.assertivita) / 200 * size;
-        
-        const projMat = new THREE.LineBasicMaterial({ color: this.accentColor, transparent: true, opacity: 0.4 });
+        const projMat = new THREE.LineBasicMaterial({ color: this.accentColor, transparent: true, opacity: 0.8 });
         const dropLine = new THREE.Line(new THREE.BufferGeometry(), projMat);
+        dropLine.renderOrder = 5; // La linea sta "sotto" la griglia (5 < 10) per effetto profondità
         scene.add(dropLine);
+
+        // --- CALCOLO COORDINATE SICURE (CLAMPING) ---
+        const getSafeCoords = () => {
+            let rawX = params.deumanizzazione + params.polarizzazione;
+            let rawZ = params.opacita + params.assertivita;
+            
+            rawX = Math.min(rawX, 200);
+            rawZ = Math.min(rawZ, 200);
+
+            const safeFactor = 0.85; 
+            const x = (rawX / 200) * size * safeFactor;
+            const z = (rawZ / 200) * size * safeFactor;
+            return { x, z };
+        };
 
         const animate = () => {
             if (!document.getElementById(containerId) || !this.scenes[containerId]) return;
-            
             const time = Date.now() * 0.0008;
             
+            // Animazione Griglia
             const positions = plane.geometry.attributes.position;
             for(let i=0; i<positions.count; i++){
                 const xBase = (i % (segments + 1));
@@ -196,19 +242,29 @@ export class Impact3DManager {
             }
             positions.needsUpdate = true;
 
+            const { x: pX, z: pZ } = getSafeCoords();
             const localWaveHeight = Math.sin((pX/size * segments)*0.4 + time)*0.02 + Math.cos((pZ/size * segments)*0.4 + time)*0.02;
-            const dotY = 1.2 + localWaveHeight; 
+            const dotY = (gridHeight + 0.5) + localWaveHeight; 
 
             dot.position.set(pX, dotY, pZ);
-            dropLine.geometry.setFromPoints([new THREE.Vector3(pX, dotY, pZ), new THREE.Vector3(pX, 0, pZ)]);
+            
+            // Area Rettangolare
+            const safeX = Math.max(0.001, pX);
+            const safeZ = Math.max(0.001, pZ);
+            highlightPlane.scale.set(safeX, safeZ, 1);
+            highlightPlane.position.set(safeX / 2, 0.01, safeZ / 2);
+
+            dropLine.geometry.setFromPoints([
+                new THREE.Vector3(pX, dotY, pZ), 
+                new THREE.Vector3(pX, 0.01, pZ)
+            ]);
 
             renderer.render(scene, camera);
             if(this.scenes[containerId]) this.scenes[containerId].frameId = requestAnimationFrame(animate);
         };
         animate();
     }
-
-    // --- CHART 2: LINES (MODIFICATO: ETICHETTE SPOSTATE A DESTRA) ---
+    // --- CHART 2: LINES (INVARIATO) ---
     createLinesChart(containerId, params) {
         const result = this.createBaseScene(containerId);
         if(!result) return;
@@ -217,43 +273,28 @@ export class Impact3DManager {
         this.scenes[containerId] = { renderer, camera, frameId: null };
         camera.position.set(0, 0, 6);
 
-        // MATERIALI
         const gridMat = new THREE.LineBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.3 });
         const thick = 0.04; 
 
-        // 1. DISEGNO ASSI SOLIDI (L-SHAPE)
-        // Y (Verticale Sx)
         scene.add(this.createThickLine(new THREE.Vector3(-3.5, -2.0, 0), new THREE.Vector3(-3.5, 2.8, 0), thick));
         scene.add(this.createArrow(new THREE.Vector3(-3.5, 2.8, 0), {x:0, y:0, z:0}));
-
-        // X (Orizzontale Basso)
         scene.add(this.createThickLine(new THREE.Vector3(-3.5, -2.0, 0), new THREE.Vector3(3.8, -2.0, 0), thick));
         scene.add(this.createArrow(new THREE.Vector3(3.8, -2.0, 0), {x:0, y:0, z:-Math.PI/2}));
 
-        // 2. GRIGLIA & ETICHETTE ALLINEATE (CORREZIONE DESTRA)
         const labels = ["2H", "4H", "8H", "12H", "1G"]; 
         const ticksCount = labels.length; 
-
-        // Area della griglia
         const startX = -3.5;
         const endGridX = 2.5; 
         const step = (endGridX - startX) / (ticksCount - 1); 
 
         for(let i=0; i<ticksCount; i++) {
             const x = startX + (i * step);
-            
-            // Disegna riga verticale
             if (i > 0) {
                 scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(x, -2.0, -0.05),
-                    new THREE.Vector3(x, 2.5, -0.05)
+                    new THREE.Vector3(x, -2.0, -0.05), new THREE.Vector3(x, 2.5, -0.05)
                 ]), gridMat));
             }
-            
-            // CALCOLO POSIZIONE CSS CORRETTO (Spostato verso destra)
-            // Aggiunto +1.5% di offset fisso per spingere le etichette a destra
-            const xPerc = 50 + (x / 7.6) * 100 + 12;
-            
+            const xPerc = 50 + (x / 7.6) * 100 + 1.5;
             this.addLabel(containerId, labels[i], xPerc, 92, 'center', '0.9rem', '#fff');
         }
 
@@ -261,7 +302,6 @@ export class Impact3DManager {
         this.addLabel(containerId, "TESTO\nMODIFICATO", 12, 42, 'right', '0.9rem', '#fff');
         this.addLabel(containerId, "TESTO\nORIGINALE", 12, 70, 'right', '0.9rem', '#888');
 
-        // 3. ONDE SPETTRALI
         const avgParams = (params.assertivita + params.emotivo + params.polarizzazione) / 300; 
         const orangeY = 0.0 + (avgParams * 1.2); 
         const orangeSpectrum = this.createSpectrum(orangeY, this.accentColor, 10, avgParams); 
@@ -272,7 +312,6 @@ export class Impact3DManager {
         const animate = () => {
             if (!document.getElementById(containerId) || !this.scenes[containerId]) return;
             const time = Date.now() * 0.001;
-
             orangeSpectrum.children.forEach(line => {
                 const pos = line.geometry.attributes.position;
                 const orig = line.userData.originalY;
@@ -284,7 +323,6 @@ export class Impact3DManager {
                 }
                 pos.needsUpdate = true;
             });
-
             greySpectrum.children.forEach(line => {
                 const pos = line.geometry.attributes.position;
                 const orig = line.userData.originalY;
@@ -295,14 +333,13 @@ export class Impact3DManager {
                 }
                 pos.needsUpdate = true;
             });
-
             renderer.render(scene, camera);
             if(this.scenes[containerId]) this.scenes[containerId].frameId = requestAnimationFrame(animate);
         };
         animate();
     }
 
-   // --- CHART 3: CUBE (MODIFICATO: SOLO FRECCE AGGIUNTE) ---
+    // --- CHART 3: CUBE (INVARIATO) ---
     createCubeChart(containerId, params) {
         const result = this.createBaseScene(containerId);
         if(!result) return;
@@ -310,22 +347,18 @@ export class Impact3DManager {
 
         this.scenes[containerId] = { renderer, camera, frameId: null };
         
-        // 1. ZOOM OUT: Camera molto più lontana per vedere gli assi
         camera.position.set(8, 6, 8); 
         camera.lookAt(0, 0.75, 0); 
 
-        const thick = 0.004; 
+        const thick = 0.006; 
         const axLen = 3.5; 
         
-        // Y Axis + Arrow
         scene.add(this.createThickLine(new THREE.Vector3(0,0,0), new THREE.Vector3(0, axLen, 0), thick)); 
         scene.add(this.createArrow(new THREE.Vector3(0, axLen, 0), {x:0, y:0, z:0}));
 
-        // X Axis + Arrow
         scene.add(this.createThickLine(new THREE.Vector3(0,0,0), new THREE.Vector3(axLen, 0, 0), thick)); 
         scene.add(this.createArrow(new THREE.Vector3(axLen, 0, 0), {x:0, y:0, z:-Math.PI/2}));
 
-        // Z Axis + Arrow
         scene.add(this.createThickLine(new THREE.Vector3(0,0,0), new THREE.Vector3(0, 0, axLen), thick)); 
         scene.add(this.createArrow(new THREE.Vector3(0, 0, axLen), {x:Math.PI/2, y:0, z:0}));
 
@@ -333,7 +366,6 @@ export class Impact3DManager {
         this.addLabel(containerId, "CORTECCIA\nPREFRONTALE", 90, 85, 'left', '1.1rem', '#fff'); 
         this.addLabel(containerId, "STRIATO\nVENTRALE", 10, 85, 'right', '1.1rem', '#fff'); 
 
-        // --- HEATMAP DINAMICA ---
         const particleCount = 3000; 
         const geometry = new THREE.BoxGeometry(0.04, 0.04, 0.04); 
         const material = new THREE.MeshBasicMaterial({ 
@@ -346,35 +378,25 @@ export class Impact3DManager {
 
         const dummy = new THREE.Object3D();
         
-        // Valori normalizzati (0-1)
-        const vY = this.normalize(params.emotivo);       // Verticale
-        const vX = this.normalize(params.deumanizzazione); // Orizzontale Dx
-        const vZ = this.normalize(params.polarizzazione);  // Orizzontale Sx
+        const vY = this.normalize(params.emotivo); 
+        const vX = this.normalize(params.deumanizzazione);
+        const vZ = this.normalize(params.polarizzazione);
 
-        // INTENSITÀ: Quanti pixel si vedono? (0 -> pochi, 5 -> tutti)
         const totalIntensity = (vX + vY + vZ) / 3;
         const visibleParticles = Math.floor(400 + (2600 * totalIntensity));
 
-        // Offset di base per la nuvola
         const offsets = [];
-        const L = 3.5; // Lunghezza assi
+        const L = 3.5; 
 
         for(let i=0; i<particleCount; i++) {
-            // Generiamo una distribuzione "Gaussian-ish" centrata su 0
-            const rX = (Math.random() - 0.5) + (Math.random() - 0.5); // Range approx -1 a 1
+            const rX = (Math.random() - 0.5) + (Math.random() - 0.5); 
             const rY = (Math.random() - 0.5) + (Math.random() - 0.5);
             const rZ = (Math.random() - 0.5) + (Math.random() - 0.5);
 
-            // LOGICA DISTRIBUZIONE IRREGOLARE:
-            // - Centro della nuvola si sposta in base ai valori (es. se vX alto, centro si sposta a destra)
-            // - Dispersione (spread) si allarga lungo l'asse relativo
-            
-            // Centro nuvola (spostato verso i valori alti)
             const cX = vX * 1.5; 
             const cY = vY * 1.5;
             const cZ = vZ * 1.5;
 
-            // Spread anisotropico (si stira lungo gli assi)
             const sX = 0.4 + (vX * 1.0); 
             const sY = 0.4 + (vY * 1.0);
             const sZ = 0.4 + (vZ * 1.0);
@@ -393,14 +415,12 @@ export class Impact3DManager {
             const time = Date.now() * 0.001;
 
             for(let i=0; i<particleCount; i++) {
-                // Gestione visibilità in base all'intensità
                 if (i > visibleParticles) {
                     dummy.scale.set(0, 0, 0);
                 } else {
                     dummy.scale.set(1, 1, 1);
                     const o = offsets[i];
                     
-                    // Floating organico
                     const floatX = Math.sin(time + o.phase) * 0.05;
                     const floatY = Math.cos(time * 0.8 + o.phase) * 0.05;
                     
