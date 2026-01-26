@@ -1,7 +1,7 @@
 import { SceneManager } from './SceneManager.js';
 import { Visual3D } from './Visual3D.js';
 import { MiniTotem } from './MiniTotem.js'; 
-import { CARDS_DATA, PARAM_DESCRIPTIONS } from './DataManager.js'; // Import unificati
+import { CARDS_DATA, PARAM_DESCRIPTIONS } from './DataManager.js'; 
 import { SemanticGraph } from './SemanticGraph.js';
 import { ImpactVisualizer } from './ImpactVisualizer.js'; 
 import { SerialManager } from './SerialManager.js';
@@ -59,16 +59,17 @@ function initCarousel() {
                 <div class="corriere-footer">DATI EUROSTAT</div>`;
         
         } else if (data.template === 'twitter') {
-            // Gestione Handle e Badge
+            // Gestione Handle (usa data.handle se esiste, altrimenti default)
             const handle = data.handle || "@Syntax_F1"; 
 
             innerHTML = `
                 <div class="twitter-header">
                     <div class="twitter-avatar"></div> 
+                    
                     <div class="twitter-user-info">
                         <div class="twitter-name-row">
                             <span class="twitter-name">${data.author}</span>
-                            <img src="./assets/images/twitter-badge.svg" class="twitter-badge" alt="verified">
+                            <img src="./assets/images/twitter-badge.svg" class="twitter-badge" alt="verified" style="width: 18px; height: 18px; margin-left: 4px;">
                         </div>
                         
                         <div class="twitter-handle-row">
@@ -181,7 +182,11 @@ if (toggleBtn && controlsPanel) {
 
 // --- NAVIGATION ---
 function goBack() {
-    if (sceneMgr.currentScene === 'carousel' && currentCardIndex > 0) { currentCardIndex--; updateCarousel(); }
+    if (sceneMgr.currentScene === 'carousel') { 
+        // MODIFICA INFINITE SCROLL: Se sono nel carosello, torno indietro loopando
+        currentCardIndex = (currentCardIndex - 1 + CARDS_DATA.length) % CARDS_DATA.length;
+        updateCarousel(); 
+    }
     else if (sceneMgr.currentScene === 'pre-edit') sceneMgr.goTo('carousel');
     else if (sceneMgr.currentScene === 'edit') sceneMgr.goTo('pre-edit');
     else if (sceneMgr.currentScene === 'impact-v2') {
@@ -212,7 +217,13 @@ const handleArduinoData = (data) => {
         }
     });
     if (data.e && data.e !== "NONE") {
-        if (data.e === "CW") { if (sceneMgr.currentScene === 'carousel' && currentCardIndex < CARDS_DATA.length - 1) { currentCardIndex++; updateCarousel(); } }
+        if (data.e === "CW") { 
+            // MODIFICA INFINITE SCROLL ARDUINO
+            if (sceneMgr.currentScene === 'carousel') { 
+                currentCardIndex = (currentCardIndex + 1) % CARDS_DATA.length; 
+                updateCarousel(); 
+            } 
+        }
         else if (data.e === "CCW") { goBack(); }
         else if (data.e === "CLICK") { handleConfirmation(); }
     }
@@ -241,7 +252,11 @@ function updateParamInfoDisplay(paramId) {
 
 document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'c') serialMgr.connect(); 
-    if (sceneMgr.currentScene === 'carousel' && e.key === 'ArrowRight' && currentCardIndex < CARDS_DATA.length - 1) { currentCardIndex++; updateCarousel(); }
+    if (sceneMgr.currentScene === 'carousel' && e.key === 'ArrowRight') { 
+        // MODIFICA INFINITE SCROLL TASTIERA
+        currentCardIndex = (currentCardIndex + 1) % CARDS_DATA.length; 
+        updateCarousel(); 
+    }
     if (e.key === 'ArrowLeft') goBack();
     if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); handleConfirmation(); }
 }); 
@@ -261,19 +276,13 @@ function handleConfirmation() {
     }
     else if (sceneMgr.currentScene === 'edit') finalizeExperience();
     else if (sceneMgr.currentScene === 'impact-v2') {
-        // --- LOGICA INPUT FISICI (ARDUINO/TASTIERA) ---
+        // --- LOGICA AGGIORNATA PER INPUT FISICI (ARDUINO/TASTIERA) ---
         const overlay = document.getElementById('final-confirmation-overlay');
-        
         if (overlay) {
-            // Se l'overlay è già visibile -> RIAVVIA
             if (overlay.classList.contains('visible')) {
-                console.log("Restarting experience via INPUT...");
-                window.location.reload();
-            } 
-            // Se l'overlay NON è visibile -> MOSTRA OVERLAY
-            else {
-                console.log("Showing overlay via INPUT...");
-                overlay.classList.add('visible');
+                window.location.reload(); // RIAVVIA
+            } else {
+                overlay.classList.add('visible'); // MOSTRA OVERLAY
             }
         }
     }
@@ -298,7 +307,7 @@ function finalizeExperience() {
     setTimeout(() => { 
         try { initImpact3D(); } catch(e) { console.error("3D Init Error", e); }
         startCarousel();
-        setupFinalInteraction(); // Attiva anche i listener del mouse
+        setupFinalInteraction(); 
     }, 100);
 }
 
@@ -309,17 +318,15 @@ function setupFinalInteraction() {
 
     if(!scene || !overlay) return;
 
-    // 1. Click su Overlay -> Riavvia (Reload Pagina)
+    // 1. Click su Overlay -> Riavvia
     overlay.addEventListener('click', () => {
-        console.log("Restarting experience via MOUSE...");
         window.location.reload(); 
     });
 
     // 2. Click su Scena -> Mostra Overlay
     const showOverlay = () => {
-        console.log("Impact clicked via MOUSE. Showing overlay.");
         overlay.classList.add('visible');
-        scene.removeEventListener('click', showOverlay); // Evita doppi trigger mouse
+        scene.removeEventListener('click', showOverlay); 
     };
 
     setTimeout(() => {
@@ -399,7 +406,6 @@ function startCarousel() {
 }
 
 function resetExperience() {
-    // Questo metodo rimane per logiche interne
     console.log("🔄 RESET INTERNO...");
     if (impactCarouselInterval) { clearInterval(impactCarouselInterval); impactCarouselInterval = null; }
     const progressBar = document.getElementById('carousel-bar');

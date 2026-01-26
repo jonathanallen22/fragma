@@ -227,7 +227,7 @@ export class SemanticGraph {
                 }
             });
             // Settiamo il target
-            d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 190);
+            d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 170);
         });
 
         // 2. Gestione MACRO TEXT (Le scritte grandi tipo "ASSERTIVITÀ")
