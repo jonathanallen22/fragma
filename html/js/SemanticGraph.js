@@ -1,5 +1,3 @@
-// js/SemanticGraph.js
-
 export class SemanticGraph {
     constructor(containerId) {
         this.containerSelector = `#${containerId}`;
@@ -7,7 +5,6 @@ export class SemanticGraph {
         
         // Controllo esistenza container
         if (this.container.empty()) {
-            // Non blocchiamo tutto se manca, ma avvisiamo
             console.warn(`SemanticGraph: Container #${containerId} not found.`);
             return;
         }
@@ -30,23 +27,43 @@ export class SemanticGraph {
         this.idleSpeed = 0.5; 
         this.time = 0;
 
-        // Distribuzione casuale parametri sui macro-assi
-        this.macroOwnership = this.macroParametri.map(() => {
-            let targets = [];
-            while(targets.length < 17) {
-                let r = Math.floor(Math.random() * this.listaParametri.length);
-                if(!targets.includes(r)) targets.push(r);
-            }
-            return targets;
+        // --- NUOVA LOGICA DI DISTRIBUZIONE (SHUFFLE + FILL) ---
+        // Garantisce che ogni parola sia assegnata ad almeno un parametro.
+        
+        // 1. Creiamo un "mazzo" con tutti gli indici
+        let allIndices = this.listaParametri.map((_, i) => i);
+
+        // 2. Mescoliamo il mazzo (Fisher-Yates Shuffle)
+        for (let i = allIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allIndices[i], allIndices[j]] = [allIndices[j], allIndices[i]];
+        }
+
+        // 3. Inizializziamo i 6 gruppi
+        this.macroOwnership = [[], [], [], [], [], []];
+
+        // 4. Distribuiamo le carte una per una sui 6 gruppi
+        allIndices.forEach((wordIndex, i) => {
+            const macroIndex = i % 6; 
+            this.macroOwnership[macroIndex].push(wordIndex);
         });
 
-        // Dataset iniziale con supporto per Easing (Lerp)
+        // 5. Riempimento (Filler) per arrivare a 17 parole per gruppo
+        this.macroOwnership.forEach(group => {
+            while(group.length < 17) {
+                let r = Math.floor(Math.random() * this.listaParametri.length);
+                // Evita duplicati nello stesso gruppo
+                if(!group.includes(r)) group.push(r);
+            }
+        });
+
+        // Dataset iniziale
         this.dataset = this.listaParametri.map((p, i) => ({
             nome: p, 
             id: i, 
             jitter: Math.random() * 10, 
             currentLen: this.LUNGHEZZA_BASE,
-            targetLen: this.LUNGHEZZA_BASE, // Valore obiettivo per l'animazione
+            targetLen: this.LUNGHEZZA_BASE, 
             x:0, y:0, nx:0, ny:0, angle:0 
         }));
 
@@ -111,37 +128,52 @@ export class SemanticGraph {
     drawStaticElements() {
         const self = this;
         
-        // 1. Definiamo la rotazione globale (150 gradi) in radianti
-        // Hardcodato per sicurezza, così funziona indipendentemente da variabili esterne
+        // --- 1. LISTA DI ECCEZIONI (PAROLE DA RUOTARE DI 180°) ---
+        // Questa lista INVERTE l'orientamento calcolato, qualunque esso sia.
+        const PAROLE_DA_INVERTIRE = [
+            "Sinestesia",
+            "Ossimoro",
+            "Litote",
+            "Iperbole",
+            "Antonomasia",
+            "Sineddoche",
+            "Metonimia",
+            "Similitudine",
+            "Metafora",
+            "Enallage",
+            "Isterologia",
+            "Tautologia",
+            "Perifrasi",
+            "Alogismo",
+            "Paradox",
+            "Correzione",
+            "Dittologia"
+        ];
+
+        // --- 2. LOGICA GEOMETRICA ORIGINALE (150°) ---
         const ROTATION_DEGREES = 150; 
         const globalRad = ROTATION_DEGREES * (Math.PI / 180);
         
-        // FUNZIONE CHE CALCOLA LA VERA POSIZIONE VISIVA
-        // Applica la rotazione 2D al punto (x,y) per vedere dove finisce sullo schermo
-        const isVisuallyLeft = (x, y) => {
-            // Formula rotazione: x' = x*cos(t) - y*sin(t)
+        const isVisuallyLeftCalc = (x, y) => {
             const visualX = x * Math.cos(globalRad) - y * Math.sin(globalRad);
-            // Se la X finale è negativa (con un po' di margine), siamo a sinistra
             return visualX < -0.1; 
         };
 
-        // --- A. MACRO TEXT (POLARIZZAZIONE, ecc.) ---
+        // --- A. MACRO TEXT ---
         const macroGroups = this.mainGroup.selectAll(".macro-group")
             .data(this.macroParametri).enter().append("g").attr("class", "macro-group");
 
         macroGroups.append("text")
             .each(function(d, i) {
                 const v = self.hexVertices[i];
+                let isLeft = isVisuallyLeftCalc(v.x, v.y);
                 
-                // Usiamo il check geometrico
-                const isLeft = isVisuallyLeft(v.x, v.y);
+                // Override per le Macro (se necessario)
+                if (PAROLE_DA_INVERTIRE.includes(d)) isLeft = !isLeft;
                 
-                let rot = v.angle * 180 / Math.PI; // Rotazione locale base
-                
-                // Se visivamente a sinistra, ruota di 180° per leggere dritto
+                let rot = v.angle * 180 / Math.PI; 
                 if (isLeft) rot += 180;
                 
-                // Calcolo posizione testo (spinto un po' fuori: 65px)
                 const tx = v.x + Math.cos(v.angle) * 65;
                 const ty = v.y + Math.sin(v.angle) * 65;
 
@@ -149,34 +181,35 @@ export class SemanticGraph {
                     .attr("x", tx)
                     .attr("y", ty)
                     .attr("class", "macro-text")
-                    // Se ruotiamo di 180 (isLeft), ancoriamo alla FINE (end)
-                    // così il testo si estende verso l'interno e non si sovrappone
                     .attr("text-anchor", isLeft ? "end" : "start") 
                     .attr("alignment-baseline", "middle")
                     .attr("transform", `rotate(${rot}, ${tx}, ${ty})`)
                     .text(d);
             });
 
-        // --- B. PARAM TEXT (Metafora, ecc.) ---
+        // --- B. PARAM TEXT ---
         const paramGroups = this.mainGroup.selectAll(".param-group")
             .data(this.dataset).enter().append("g").attr("class", "param-group");
 
         paramGroups.append("text")
             .attr("class", "param-text")
             .each(function(d) {
-                // Check geometrico sulle coordinate del parametro
-                const isLeft = isVisuallyLeft(d.x, d.y);
-                d.isVisualLeft = isLeft; // Salviamo per le linee
+                // 1. Calcolo standard
+                let isLeft = isVisuallyLeftCalc(d.x, d.y);
 
-                // Calcolo rotazione locale
+                // 2. Override INVERSO (Flip)
+                if (PAROLE_DA_INVERTIRE.includes(d.nome)) {
+                    isLeft = !isLeft; 
+                }
+
+                d.isVisualLeft = isLeft; 
+
                 let rot = Math.atan2(d.ny, d.nx) * (180 / Math.PI);
                 
-                // Fix rotazione se a sinistra
                 if (isLeft) rot += 180;
 
                 d3.select(this)
                     .attr("x", d.x).attr("y", d.y)
-                    // Anchor dinamico: A sinistra 'end', a destra 'start'
                     .attr("text-anchor", isLeft ? "end" : "start")
                     .attr("alignment-baseline", "middle")
                     .attr("transform", `rotate(${rot}, ${d.x}, ${d.y})`)
@@ -189,12 +222,8 @@ export class SemanticGraph {
             .each(function(d) {
                 const textNode = d3.select(this.parentNode).select("text").node();
                 const tw = textNode.getBBox().width;
-                const gap = 12; // Spazio tra testo e linea
+                const gap = 12; 
 
-                // La linea deve sempre partire DOPO il testo, andando verso l'esterno.
-                // Poiché abbiamo gestito l'anchor (start/end) e la rotazione (0/180),
-                // la logica della distanza è identica per entrambi i lati:
-                // Dobbiamo saltare la larghezza del testo + il gap.
                 const startDist = tw + gap;
 
                 d.lx = d.x + d.nx * startDist;
@@ -214,35 +243,30 @@ export class SemanticGraph {
         this.updateVisuals();
     }
 
-   // Inserisci questa funzione dentro SemanticGraph.js al posto della vecchia updateVisuals
-
     updateVisuals() {
         // 1. Calcolo target delle linee
         this.dataset.forEach(d => {
             let somma = 0;
             this.macroOwnership.forEach((targets, mIdx) => {
-                // Se questo parametro (d.id) è influenzato dal macro-slider (mIdx) attivo...
                 if (targets.includes(d.id) && this.livelli[mIdx] > 0) {
                     somma += (this.livelli[mIdx] * 0.04 * this.MOLTIPLICATORE * 10) + d.jitter;
                 }
             });
-            // Settiamo il target
-            d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 170);
+            // Limitiamo la lunghezza massima a 140
+            d.targetLen = Math.min(this.LUNGHEZZA_BASE + somma, 140);
         });
 
-        // 2. Gestione MACRO TEXT (Le scritte grandi tipo "ASSERTIVITÀ")
+        // 2. Macro Text Highlight
         this.mainGroup.selectAll(".macro-text").transition().duration(300)
             .style("fill", (d, i) => this.livelli[i] > 5 ? "#ffffff" : "#444");
 
-        // --- 3. NUOVO: Gestione PARAM TEXT (Le scritte piccole tipo "Metafora") ---
+        // 3. Param Text Highlight
         this.mainGroup.selectAll(".param-text").transition().duration(400)
             .style("fill", d => {
-                // Se la linea si sta allungando (targetLen > 2), accendiamo il testo.
-                // Altrimenti resta spento (#333).
                 return d.targetLen > 2 ? "#e0e0e0" : "#333";
             });
 
-        // 4. Gestione Ragnatela (Connessioni interne)
+        // 4. Ragnatela
         const activeLinks = [];
         this.macroOwnership.forEach((targets, mIdx) => {
             const liv = this.livelli[mIdx];
@@ -270,15 +294,11 @@ export class SemanticGraph {
         const assertivita = this.livelli[3] / 100;
         const timeFactor = this.time * 0.6; 
         const lineAmplitude = 0.5 + (emotivo * 1.5);
-
-        // --- LERP FACTOR (Velocità Ease) ---
-        // 0.1  = Bilanciato (fluido e reattivo)
         const lerpFactor = 0.1;
 
-        // --- AGGIORNAMENTO LINEE (Istogrammi) ---
+        // AGGIORNAMENTO LINEE
         this.valueLines
             .attr("x2", d => {
-                // Inseguimento fluido del target
                 d.currentLen += (d.targetLen - d.currentLen) * lerpFactor;
                 
                 const noise = Math.sin(timeFactor + d.id/5) * lineAmplitude;
@@ -293,7 +313,7 @@ export class SemanticGraph {
                 return d.ly + d.ny * finalLen;
             });
 
-        // --- AGGIORNAMENTO RAGNATELA ---
+        // AGGIORNAMENTO RAGNATELA
         const bundle = d3.line().curve(d3.curveBundle.beta(0.85 + (assertivita * 0.15)));
         
         this.mainGroup.selectAll(".connection")
@@ -311,12 +331,10 @@ export class SemanticGraph {
             .style("stroke-opacity", 0.4 + Math.sin(this.time * 1.5) * 0.2);
     }
 
-    // --- METODO AGGIUNTO PER EVITARE CRASH ---
     resize() {
         if(!this.container || this.container.empty()) return;
         this.container.selectAll("svg").remove();
         this.initSVG();
-        // Forza un aggiornamento visuale immediato
         this.updateVisuals();
     }
 }
