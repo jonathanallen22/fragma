@@ -1180,7 +1180,7 @@ pre-edit-text-wrapper {
     width: 100%;
     height: 100%;
     /* SFONDO MOLTO SCURO E SFOCATO */
-    background-color: rgba(0, 0, 0, 0.35); 
+    background-color: rgba(0, 0, 0, 0.25 ); 
     backdrop-filter: blur(20px); /* Sfocatura intensa */
     -webkit-backdrop-filter: blur(20px);
     z-index: 9999;
